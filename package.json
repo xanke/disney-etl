@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "moment": "^2.20.1",
+    "redis": "^2.8.0"
+  }
+}

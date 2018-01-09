@@ -2,3 +2,4 @@ _notes
 *.log
 .DS_Store
 node_modules
+config/production.js

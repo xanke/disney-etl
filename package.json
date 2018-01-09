@@ -1,6 +1,22 @@
 {
+  "name": "disney-etl",
+  "version": "0.0.1",
+  "description": "Disney ETL and Api",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=production pm2 start index.js --name 'disney-etl'"
+  },
   "dependencies": {
+    "config-lite": "^2.1.0",
+    "express": "^4.16.2",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.0",
+    "https": "^1.0.0",
     "moment": "^2.20.1",
-    "redis": "^2.8.0"
+    "mongolass": "^3.1.5",
+    "mysql": "^2.15.0"
+  },
+  "devDependencies": {
+    "supertest": "^3.0.0"
   }
 }

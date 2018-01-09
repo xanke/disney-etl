@@ -4,11 +4,15 @@ module.exports = {
   insert: async data => {
     return Info.create(data).exec()
   },
+  find: async find => {
+    let data = await Info.find(find).exec()
+    return data
+  },
   findOne: async find => {
     let data = await Info.findOne(find).exec()
     return data
   },
-  updateWait: async (find, data) => {
-    return Info.update(find, { $set: data, $push: { waitList: data['waitTime'] } }).exec()
+  update: async (find, data) => {
+    return Info.update(find, { $set: data }).exec()
   }
 }

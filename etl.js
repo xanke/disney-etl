@@ -3,6 +3,7 @@ const config = require('config-lite')(__dirname)
 const moment = require('moment')
 
 const infoModel = require('./models/info')
+const { xToDateX } = require('./lib/moment')
 
 var connection = mysql.createConnection({
   host: config.mysql.host,
@@ -44,7 +45,6 @@ async function handleInfo(utime) {
 
   info.forEach(item => {
     let { name, utime, start_time, end_time, type, status } = item
-
     if (type === 2) {
       type = 'Attraction'
       let json = {
@@ -59,7 +59,6 @@ async function handleInfo(utime) {
       nInfo.push(json)
     }
   })
-
   await infoModel.insert(nInfo)
   console.log(utime, 'ok')
 }
@@ -73,4 +72,74 @@ async function startInfo() {
   }
 }
 
-startInfo()
+// startInfo()
+
+// 等待时间处理
+function getWaitDb(name, utime) {
+  return new Promise((resolve, reject) => {
+    let [st, et] = xToDateX(utime)
+    connection.query(
+      `SELECT * FROM db_disney WHERE (utime >= ${st} AND utime <= ${et}) AND name = '${name}'`,
+      (err, rows, fields) => {
+        if (err) throw err
+        resolve(rows)
+      }
+    )
+  })
+}
+
+async function handleWait(utime) {
+  let date = moment(utime * 1000, 'x').format('YYYYMMDD')
+  let att = await infoModel.find({ date })
+
+  for (let item of att) {
+    let { name, date } = item
+    let arr = await getWaitDb(name, utime)
+
+    if (arr.length === 0) {
+      console.log('无数据')
+      continue
+    }
+
+    let waitList = []
+    arr.forEach(item => {
+      let {
+        utime,
+        fastPass,
+        status,
+        signleRider,
+        postedWaitMinutes,
+        fastPassStartTime
+      } = item
+
+      let json = {
+        status,
+        signleRider: !!signleRider,
+        postedWaitMinutes,
+        utime
+      }
+
+      if (fastPassStartTime != 0) {
+        let available = fastPassStartTime !== 'FASTPASS is Not Available'
+        json.fastPass = {
+          startTime: fastPassStartTime,
+          available
+        }
+      }
+      waitList.push(json)
+    })
+    await infoModel.update({ name, date, local: 'shanghai' }, { waitList })
+  }
+  console.log(date, 'ok')
+}
+
+async function startWait() {
+  let start = 1492358400 // 20170417
+
+  for (let day = 0; day <= 400; day++) {
+    let utime = start + 86400 * day
+    await handleWait(utime)
+  }
+}
+
+startWait()

@@ -142,4 +142,4 @@ async function startWait() {
   }
 }
 
-startWait()
+// startWait()

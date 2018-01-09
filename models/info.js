@@ -4,8 +4,18 @@ module.exports = {
   insert: async data => {
     return Info.create(data).exec()
   },
-  find: async find => {
-    let data = await Info.find(find).exec()
+  getday: async (local, date, mode) => {
+    console.log(date)
+    let data = await Info.find(
+      { date: date },
+      {
+        name: 1,
+        type: 1,
+        startTime: 1,
+        endTime: 1,
+        status: 1
+      }
+    ).exec()
     return data
   },
   findOne: async find => {

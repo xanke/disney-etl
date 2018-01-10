@@ -1,6 +1,6 @@
 module.exports = function(app) {
   app.use('/info', require('./info'))
-  app.use('/wait', require('./info'))
+  app.use('/task', require('./task'))
   // 404 page
   app.use((req, res) => {
     if (!res.headersSent) {

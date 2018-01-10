@@ -113,7 +113,24 @@ module.exports = {
     }
     return []
   },
-
+  getTaskAtt: async (local, date) => {
+    let data = await Info.find(
+      {
+        local,
+        date,
+        type: 'Attraction'
+      },
+      {
+        _id: 0,
+        schedules: 0
+      }
+    ).exec()
+    return data
+  },
+  find: async find => {
+    let data = await Info.find(find).exec()
+    return data
+  },
   findOne: async find => {
     let data = await Info.findOne(find).exec()
     return data

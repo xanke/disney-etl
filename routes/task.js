@@ -76,8 +76,13 @@ async function taskPark(date, local = 'shanghai') {
 
   let waitCubeArr = [] //所有项目矩阵
   let utimeArr = [] //等待时间列表
+  let openAtt = 0
+  let allAtt = data.length
   data.forEach(item => {
-    let { waitList } = item
+    let { waitList, status } = item
+    if (status === 'Operating') {
+      openAtt++
+    }
     if (waitList) {
       let attWaitArr = waitList.map(_ => _.postedWaitMinutes)
       utimeArr = waitList.map(_ => _.utime)
@@ -94,9 +99,18 @@ async function taskPark(date, local = 'shanghai') {
     }
     countArr.push({
       utime: utimeArr[key],
-      count
+      count,
+      avg: parseFloat((count / openAtt).toFixed(2))
     })
   }
+
+  let count = {
+    openAtt,
+    allAtt,
+    countList: countArr
+  }
+
+  console.log(count)
 }
 
 // 乐园整体日终统计

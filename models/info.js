@@ -7,7 +7,7 @@ module.exports = {
     return Info.create(data).exec()
   },
   // 乐园开放时间
-  getOpentime: async (local, method, st, et) => {
+  getOpenTime: async (local, method, st, et) => {
     if (method === 'day') {
       let data = await Info.find(
         { date: st },
@@ -85,6 +85,27 @@ module.exports = {
           endTime: 1,
           status: 1,
           waitList: 1,
+          _id: 0
+        }
+      ).exec()
+      return data
+    }
+    return []
+  },
+  // 乐园整体情况
+  getParkWait: async (local, method, indicators, st, et) => {
+    if (method === 'now') {
+      let data = await Info.find(
+        {
+          date: st
+        },
+        {
+          name: 1,
+          type: 1,
+          startTime: 1,
+          endTime: 1,
+          status: 1,
+          waitTime: 1,
           _id: 0
         }
       ).exec()

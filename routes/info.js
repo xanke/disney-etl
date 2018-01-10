@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const infoModel = require('../models/info')
+const moment = require('moment')
 
 function handerMethod(query, res, next) {
   let {
@@ -21,7 +22,7 @@ function handerMethod(query, res, next) {
   if (name === 'opentime') {
     let [method = 'day'] = _method
     infoModel
-      .getOpentime(local, method, st, et)
+      .getOpenTime(local, method, st, et)
       .then(data => {
         res.retData(data, 'arr')
       })
@@ -33,6 +34,15 @@ function handerMethod(query, res, next) {
     }
     infoModel
       .getAttWait(local, method, indicators, st, et)
+      .then(data => {
+        res.retData(data, 'arr')
+      })
+      .catch(next)
+  } else if (name === 'park') {
+    // 默认获取实时
+    let [method = 'now'] = _method
+    infoModel
+      .getParkWait(local, method, indicators, st, et)
       .then(data => {
         res.retData(data, 'arr')
       })

@@ -127,6 +127,20 @@ module.exports = {
     ).exec()
     return data
   },
+  getTaskPark: async (local, date) => {
+    let data = await Info.find(
+      {
+        local,
+        date,
+        type: 'theme-park'
+      },
+      {
+        _id: 0,
+        schedules: 0
+      }
+    ).exec()
+    return data
+  },
   find: async find => {
     let data = await Info.find(find).exec()
     return data

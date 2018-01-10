@@ -65,4 +65,52 @@ router.get('/att', async (req, res, next) => {
   res.retData('countOk')
 })
 
+// 乐园整体日终统计
+async function taskPark(date, local = 'shanghai') {
+  let data = await infoModel.getTaskAtt(local, date)
+  let disneyPark = await infoModel.getTaskPark(local, date)
+  let { startTime, endTime } = disneyPark
+
+  let startX = openTimeToX(date, startTime)
+  let endX = openTimeToX(date, endTime)
+
+  let waitCubeArr = [] //所有项目矩阵
+  let utimeArr = [] //等待时间列表
+  data.forEach(item => {
+    let { waitList } = item
+    if (waitList) {
+      let attWaitArr = waitList.map(_ => _.postedWaitMinutes)
+      utimeArr = waitList.map(_ => _.utime)
+      waitCubeArr.push(attWaitArr)
+    }
+  })
+
+  // 所有项目等待时间合并
+  let countArr = []
+  for (let key of waitCubeArr[0]) {
+    let count = 0
+    for (let arr of waitCubeArr) {
+      count += arr[key]
+    }
+    countArr.push({
+      utime: utimeArr[key],
+      count
+    })
+  }
+}
+
+// 乐园整体日终统计
+router.get('/park', async (req, res, next) => {
+  let { date, local = 'shanghai', method } = req.query
+
+  // let st = 1492358400 // 20170417
+  // for (let day = 0; day <= 300; day++) {
+  //   let date = moment((st + 86400 * day) * 1000, 'x').format('YYYYMMDD')
+  //   await taskAtt(date, local)
+  // }
+
+  await taskPark(date, local)
+  res.retData('countOk')
+})
+
 module.exports = router

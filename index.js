@@ -78,5 +78,6 @@ if (module.parent) {
   var httpsServer = https.createServer(credentials, app)
   httpsServer.listen(443)
 
+  console.log(process.env.NODE_ENV);
   console.log('Disney-ETL')
 }

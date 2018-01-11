@@ -89,6 +89,20 @@ module.exports = {
         }
       ).exec()
       return data
+    } else if (method === 'search') {
+      let data = await Info.find(
+        {
+          date: { $gte: st, $lte: et },
+          name: indicators
+        },
+        {
+          name: 1,
+          type: 1,
+          countWait: 1,
+          _id: 0
+        }
+      ).exec()
+      return data
     }
     return []
   },

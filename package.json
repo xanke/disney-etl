@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=production pm2 start index.js --name 'disney-etl'",
-    "dep": "set NODE_ENV=productio&&node index"
+    "dep": "set NODE_ENV=production&&node index"
   },
   "dependencies": {
     "config-lite": "^2.1.0",

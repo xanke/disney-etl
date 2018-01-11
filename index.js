@@ -74,7 +74,7 @@ if (module.parent) {
   var cert = fs.readFileSync('./cert/certificate.crt', 'utf8')
   var credentials = { key, cert }
   console.log(process.env.NODE_ENV)
-  if (process.env.NODE_ENV === 'productio') {
+  if (process.env.NODE_ENV === 'production') {
     http.createServer(app).listen(17101)
   } else {
     http.createServer(app).listen(80)

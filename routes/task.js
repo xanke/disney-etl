@@ -67,6 +67,9 @@ router.get('/att', async (req, res, next) => {
 
 // 乐园整体日终统计
 async function taskPark(date, local = 'shanghai') {
+  let msgArr = []
+  let msg = ''
+
   let data = await infoModel.getTaskAtt(local, date)
   let disneyPark = await infoModel.getTaskPark(local, date)
   let { startTime, endTime } = disneyPark
@@ -90,41 +93,71 @@ async function taskPark(date, local = 'shanghai') {
     }
   })
 
+  if (utimeArr.length === 0) {
+    console.log(date, '未统计waitList')
+    return `${date} 未统计waitList`
+  }
+
   // 所有项目等待时间合并
+  let countList = []
   let countArr = []
   for (let key of waitCubeArr[0]) {
     let count = 0
     for (let arr of waitCubeArr) {
       count += arr[key]
     }
-    countArr.push({
+    countArr.push(count)
+    countList.push({
       utime: utimeArr[key],
       count,
       avg: parseFloat((count / openAtt).toFixed(2))
     })
   }
 
-  let count = {
+  let max = Math.max(...countArr)
+  let avg = parseFloat(arrayAvg(countArr).toFixed(2))
+  let maxList = []
+
+  maxList = countList.filter(item => {
+    return item.count === max
+  })
+  maxList = maxList.map(item => {
+    return item.utime
+  })
+
+  let countWait = {
+    max,
+    avg,
+    maxList,
     openAtt,
-    allAtt,
-    countList: countArr
+    allAtt
   }
 
-  console.log(count)
+  // 更新数据
+  await infoModel.update(
+    { type: 'theme-park', date, local },
+    { countWait, waitList: countList }
+  )
+  console.log('theme-park', date, 'ok')
+  return `${date} ok`
 }
 
 // 乐园整体日终统计
 router.get('/park', async (req, res, next) => {
-  let { date, local = 'shanghai', method } = req.query
+  let { date, local = 'shanghai', method = '' } = req.query
+  let msgArr = []
 
-  // let st = 1492358400 // 20170417
-  // for (let day = 0; day <= 300; day++) {
-  //   let date = moment((st + 86400 * day) * 1000, 'x').format('YYYYMMDD')
-  //   await taskAtt(date, local)
-  // }
+  if (method === 'rest') {
+    let st = 1492358400 // 20170417
+    for (let day = 0; day <= 300; day++) {
+      let date = moment((st + 86400 * day) * 1000, 'x').format('YYYYMMDD')
+      msgArr.push(await taskPark(date, local))
+    }
+  } else {
+    msgArr.push(await taskPark(date, local))
+  }
 
-  await taskPark(date, local)
-  res.retData('countOk')
+  res.retData(msgArr, 'arr')
 })
 
 module.exports = router

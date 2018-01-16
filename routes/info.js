@@ -3,6 +3,7 @@ const router = express.Router()
 const infoModel = require('../models/info')
 const moment = require('moment')
 
+// 方法处理
 function handerMethod(query, res, next) {
   let {
     st = '20180109',

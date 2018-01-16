@@ -120,9 +120,23 @@ module.exports = {
           endTime: 1,
           status: 1,
           waitTime: 1,
+          schedules: 1,
           _id: 0
         }
       ).exec()
+
+      data.forEach(item => {
+        // 提取今日演出时间
+        if (item.type === 'Entertainment' && item.schedules) {
+          let schedules = item.schedules
+          let date = moment(st, 'YYYYMMDD').format('YYYY-MM-DD')
+          schedules = schedules.filter(item => item.date == date)
+          item.showList = schedules
+          console.log(schedules)
+        }
+        delete item.schedules
+      })
+
       return data
     }
     return []

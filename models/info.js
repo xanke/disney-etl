@@ -132,7 +132,6 @@ module.exports = {
           let date = moment(st, 'YYYYMMDD').format('YYYY-MM-DD')
           schedules = schedules.filter(item => item.date == date)
           item.showList = schedules
-          console.log(schedules)
         }
         delete item.schedules
       })

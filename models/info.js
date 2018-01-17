@@ -135,7 +135,7 @@ module.exports = {
         let { waitList } = item
         let wList = []
         waitList.forEach(arr => {
-          let { utime, postedWaitMinutes, status } = arr
+          let { utime, postedWaitMinutes = 0, status } = arr
           let _time = [utime, postedWaitMinutes, status]
 
           if (arr.fastPass && arr.fastPass.startTime) {

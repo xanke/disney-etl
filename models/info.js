@@ -98,8 +98,9 @@ module.exports = {
           name: indicators
         },
         {
-          name: 1,
-          type: 1,
+          // name: 1,
+          // type: 1,
+          date: 1,
           countWait: 1,
           _id: 0
         }

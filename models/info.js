@@ -1,6 +1,7 @@
 const Info = require('../lib/mongo').Info
 const moment = require('moment')
 const { countDayNum } = require('../lib/util')
+const { timeSim } = require('../lib/moment')
 
 module.exports = {
   insert: async data => {
@@ -73,7 +74,7 @@ module.exports = {
   // 项目等待时间
   getAttWait: async (local, method, indicators, st, et) => {
     if (method === 'day') {
-      let data = await Info.find(
+      let data = await Info.findOne(
         {
           date: st,
           name: indicators
@@ -88,6 +89,7 @@ module.exports = {
           _id: 0
         }
       ).exec()
+
       return data
     } else if (method === 'search') {
       let data = await Info.find(
@@ -102,6 +104,48 @@ module.exports = {
           _id: 0
         }
       ).exec()
+
+      return data
+    } else if (method === 'three') {
+      let yd = moment(st, 'YYYYMMDD')
+        .subtract(1, 'days')
+        .format('YYYYMMDD')
+      let lk = moment(st, 'YYYYMMDD')
+        .subtract(7, 'days')
+        .format('YYYYMMDD')
+
+      let data = await Info.find(
+        {
+          date: { $in: [st, yd, lk] },
+          name: indicators
+        },
+        {
+          name: 1,
+          type: 1,
+          startTime: 1,
+          endTime: 1,
+          status: 1,
+          waitList: 1,
+          date: 1,
+          _id: 0
+        }
+      ).exec()
+
+      data.forEach(item => {
+        let { waitList } = item
+        let wList = []
+        waitList.forEach(arr => {
+          let { utime, postedWaitMinutes, status } = arr
+          let _time = [utime, postedWaitMinutes, status]
+
+          if (arr.fastPass && arr.fastPass.startTime) {
+            _time.push(arr.fastPass.startTime)
+          }
+          wList.push(_time)
+        })
+        item.waitList = wList
+      })
+
       return data
     }
     return []
@@ -126,11 +170,32 @@ module.exports = {
       ).exec()
 
       data.forEach(item => {
+        // item.startTime = timeSim(item.startTime)
+        // item.endTime = timeSim(item.endTime)
+        // if (
+        //   item.waitTime &&
+        //   item.waitTime.fastPass &&
+        //   item.waitTime.fastPass.startTime
+        // ) {
+        //   let { startTime, endTime } = item.waitTime.fastPass
+        //   item.waitTime.fastPass.startTime = timeSim(
+        //     item.waitTime.fastPass.startTime
+        //   )
+        //   item.waitTime.fastPass.endTime = timeSim(
+        //     item.waitTime.fastPass.endTime
+        //   )
+        // }
+
         // 提取今日演出时间
         if (item.type === 'Entertainment' && item.schedules) {
           let schedules = item.schedules
           let date = moment(st, 'YYYYMMDD').format('YYYY-MM-DD')
           schedules = schedules.filter(item => item.date == date)
+          // schedules.forEach(item => {
+          //   let { startTime, endTime } = item
+          //   item.startTime = timeSim(startTime)
+          //   item.endTime = timeSim(endTime)
+          // })
           item.showList = schedules
         }
         delete item.schedules

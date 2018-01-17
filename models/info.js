@@ -129,21 +129,47 @@ module.exports = {
           date: 1,
           _id: 0
         }
-      ).exec()
+      )
+        .sort({ date: -1 })
+        .exec()
 
       data.forEach(item => {
         let { waitList } = item
         let wList = []
-        waitList.forEach(arr => {
-          let { utime, postedWaitMinutes = 0, status } = arr
-          let _time = [utime, postedWaitMinutes, status]
 
-          if (arr.fastPass && arr.fastPass.startTime) {
-            _time.push(arr.fastPass.startTime)
-          }
-          wList.push(_time)
-        })
+        let { startTime, endTime } = item
+
+        let sh = parseInt(moment(startTime, 'hh:mm:ss').format('H'))
+        let eh = parseInt(moment(endTime, 'hh:mm:ss').format('H'))
+
+        for (let i = sh; i <= eh; i++) {
+          let len = 0
+          let num = 0
+          waitList.forEach(arr => {
+            let { utime, postedWaitMinutes = 0, status } = arr
+            let h = parseInt(moment(utime * 1000, 'x').format('H'))
+            if (h === i) {
+              num += postedWaitMinutes
+              len++
+            }
+          })
+
+          let avg = parseInt(num / len)
+          wList.push([i, avg])
+        }
+
         item.waitList = wList
+        // 日期详情
+        // waitList.forEach(arr => {
+        //   let { utime, postedWaitMinutes = 0, status } = arr
+        //   let _time = [utime, postedWaitMinutes, status]
+
+        //   if (arr.fastPass && arr.fastPass.startTime) {
+        //     _time.push(arr.fastPass.startTime)
+        //   }
+        //   wList.push(_time)
+        // })
+        // item.waitList = wList
       })
 
       return data

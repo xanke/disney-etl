@@ -1,11 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const infoModel = require('../models/info')
+const InfoModel = require('../models/info')
+const ScanWaitModel = require('../models/scan_wait')
+const ScanInfoModel = require('../models/scan_info')
 const moment = require('moment')
 const { openTimeToX, arrayAvg } = require('../lib/util')
 
 async function taskAtt(date, local = 'shanghai') {
-  let data = await infoModel.getTaskAtt(local, date)
+  let data = await InfoModel.getTaskAtt(local, date)
 
   for (let item of data) {
     let { name, startTime, endTime, status, waitList = [] } = item
@@ -46,21 +48,98 @@ async function taskAtt(date, local = 'shanghai') {
       maxList
     }
     // 更新数据
-    await infoModel.update({ name, date, local }, { countWait })
+    await InfoModel.update({ name, date, local }, { countWait })
   }
   console.log(date, 'ok')
 }
 
+// 数据重新清洗
+router.get('/etl', async (req, res, next) => {
+  try {
+    let { date, local } = req.query
+
+    console.log(date, local)
+
+    // let scandata = await ScanWaitModel.find({ local, date })
+
+    let info = await ScanInfoModel.findOne({ local, date })
+    info = info.body
+    let { ancestor, activities } = info
+
+    // 游乐项目提取
+    let attData = []
+    for (let item of activities) {
+      let { id } = item
+      id = id.split(';')
+
+      let name = id[0]
+      let type = id[1].replace('entityType=', '')
+
+      if (type === 'Attraction') {
+        attData.push([name, type])
+      }
+    }
+
+    // attData
+
+    let wait = await ScanWaitModel.find({ local, date })
+
+    for (let waitItem of wait) {
+      let entries = waitItem.body.entries
+      let utime = waitItem.utime
+      for (let item of entries) {
+        let { id } = item
+        id = id.split(';')
+
+        let name = id[0]
+        let type = id[1].replace('entityType=', '')
+
+        if (name === 'attTronLightcyclePowerRun') {
+          let waitTime = item.waitTime
+          let { fastPass, status, postedWaitMinutes = 0 } = waitTime
+
+          let waitArr = [utime, status, postedWaitMinutes]
+
+          if (fastPass) {
+            let { startTime = '', endTime = '', available } = fastPass
+            waitArr.push(startTime, endTime, available)
+          }
+          console.log(waitArr)
+          // console.log([fastPass, status, signleRider ])
+        }
+      }
+    }
+
+    // console.log(attData)
+    // console.log(attData.length)
+
+    // console.log(scandata)
+    // for (let item of scandata) {
+    //   let atts = item.body.entries
+    //   let utime = item.utime
+
+    //   for (let aItem of atts) {
+    //     let id = aItem.id
+    //     // console.log(type)
+    //     // InfoModel.update({ date, local, name:id})
+    //     // console.log(aItem.id)
+    //   }
+    // }
+
+    res.retData('countOk')
+  } catch (e) {
+    return res.retErr(e.message)
+  }
+})
+
 // 乐园项目日终统计
 router.get('/att', async (req, res, next) => {
   let { date, local = 'shanghai', method } = req.query
-
   // let st = 1492358400 // 20170417
   // for (let day = 0; day <= 300; day++) {
   //   let date = moment((st + 86400 * day) * 1000, 'x').format('YYYYMMDD')
   //   await taskAtt(date, local)
   // }
-
   await taskAtt(date, local)
   res.retData('countOk')
 })
@@ -70,8 +149,8 @@ async function taskPark(date, local = 'shanghai') {
   let msgArr = []
   let msg = ''
 
-  let data = await infoModel.getTaskAtt(local, date)
-  let disneyPark = await infoModel.getTaskPark(local, date)
+  let data = await InfoModel.getTaskAtt(local, date)
+  let disneyPark = await InfoModel.getTaskPark(local, date)
   let { startTime, endTime } = disneyPark
 
   let startX = openTimeToX(date, startTime)
@@ -134,7 +213,7 @@ async function taskPark(date, local = 'shanghai') {
   }
 
   // 更新数据
-  await infoModel.update(
+  await InfoModel.update(
     { type: 'theme-park', date, local },
     { countWait, waitList: countList }
   )

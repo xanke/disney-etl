@@ -77,9 +77,9 @@ if (module.parent) {
   if (process.env.NODE_ENV === 'production') {
     http.createServer(app).listen(17101)
   } else {
-    // http.createServer(app).listen(80)
-    var httpsServer = https.createServer(credentials, app)
-    httpsServer.listen(443)
+    http.createServer(app).listen(8013)
+    // var httpsServer = https.createServer(credentials, app)
+    // httpsServer.listen(443)
   }
   console.log('Disney-ETL')
 }

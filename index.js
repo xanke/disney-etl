@@ -14,16 +14,8 @@ app.use((req, res, next) => {
   res.retErr = (err, code = 400) => {
     res.json({ err, code })
   }
-  res.retData = (data, mode = '', code = 200) => {
-    if (mode === 'arr') {
-      let arr = data
-      let total = arr.length
-      data = {
-        arr,
-        total
-      }
-    }
-    res.json({ data, code })
+  res.retData = data => {
+    res.json(data)
   }
   next()
 })

@@ -218,11 +218,6 @@ module.exports = {
           let schedules = item.schedules
           let date = moment(st, 'YYYYMMDD').format('YYYY-MM-DD')
           schedules = schedules.filter(item => item.date == date)
-          // schedules.forEach(item => {
-          //   let { startTime, endTime } = item
-          //   item.startTime = timeSim(startTime)
-          //   item.endTime = timeSim(endTime)
-          // })
           item.showList = schedules
         }
         delete item.schedules
@@ -240,26 +235,12 @@ module.exports = {
         type: 'Attraction'
       },
       {
-        _id: 0,
-        schedules: 0
+        _id: 0
       }
     ).exec()
     return data
   },
-  getTaskPark: async (local, date) => {
-    let data = await Info.find(
-      {
-        local,
-        date,
-        type: 'theme-park'
-      },
-      {
-        _id: 0,
-        schedules: 0
-      }
-    ).exec()
-    return data
-  },
+
   find: async find => {
     let data = await Info.find(find).exec()
     return data
@@ -269,6 +250,16 @@ module.exports = {
     return data
   },
   update: async (find, data) => {
-    return Info.update(find, { $set: data }).exec()
+    return Info.update(find, { $set: data }, {
+      upsert: true
+    }).exec()
+  },
+
+  upsert: async (find, data) => {
+    return Info.upsert(find, { $set: data }).exec()
+  },
+
+  push: async (find, data) => {
+    return Info.update(find, { $push: data }).exec()
   }
 }

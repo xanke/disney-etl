@@ -111,7 +111,6 @@ module.exports = {
       mode = 'today'
     }
 
-
     let dateList = []
 
     if (mode === 'search') {
@@ -123,7 +122,11 @@ module.exports = {
         let date = moment(stX + d * 86400, 'X').format('YYYYMMDD')
         dateList.push([date, local])
       }
-    } else {
+    } else if (mode === 'only') {
+      dateList.push([st, local])
+    } else if (mode === 'today') {
+      let
+
       dateList.push([date, local])
     }
 

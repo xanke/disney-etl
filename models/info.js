@@ -255,10 +255,6 @@ module.exports = {
     }).exec()
   },
 
-  upsert: async (find, data) => {
-    return Info.upsert(find, { $set: data }).exec()
-  },
-
   push: async (find, data) => {
     return Info.update(find, { $push: data }).exec()
   }

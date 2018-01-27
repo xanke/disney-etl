@@ -6,10 +6,8 @@ const { openTimeToX, arrayAvg } = require('../lib/util')
 const { infoEtl, handleWaitArr, formatId } = require('../lib/etl')
 const { parkList } = require('../lib/park_arr')
 
-
 // 原始清洗信息入库
 async function handleInfo(db) {
-
   // 遍历插入初始化数据
   let infoData = scanInfo(infoData)
   for (let item of infoData) {

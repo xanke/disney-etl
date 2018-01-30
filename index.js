@@ -58,20 +58,14 @@ app.use((err, req, res, next) => {
   res.retErr(err.message)
 })
 
-if (module.parent) {
-  // 被 require，则导出 app
-  module.exports = app
+const key = fs.readFileSync('./cert/privatekey.pem', 'utf8')
+const cert = fs.readFileSync('./cert/certificate.crt', 'utf8')
+const credentials = { key, cert }
+if (process.env.NODE_ENV === 'production') {
+  http.createServer(app).listen(17101)
 } else {
-  var key = fs.readFileSync('./cert/privatekey.pem', 'utf8')
-  var cert = fs.readFileSync('./cert/certificate.crt', 'utf8')
-  var credentials = { key, cert }
-  console.log(process.env.NODE_ENV)
-  if (process.env.NODE_ENV === 'production') {
-    http.createServer(app).listen(17101)
-  } else {
-    http.createServer(app).listen(8013)
-    // var httpsServer = https.createServer(credentials, app)
-    // httpsServer.listen(443)
-  }
-  console.log('Disney-ETL')
+  http.createServer(app).listen(8013)
+  // var httpsServer = https.createServer(credentials, app)
+  // httpsServer.listen(443)
 }
+console.log('Disney-ETL')

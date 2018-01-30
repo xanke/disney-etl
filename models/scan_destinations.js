@@ -1,6 +1,10 @@
 const ScanDestinations = require('../lib/mongo').ScanDestinations
 
 module.exports = {
+  findOne: async find => {
+    return ScanDestinations.findOne(find).exec()
+  },
+
   insert: async data => {
     return ScanDestinations.create(data).exec()
   },

@@ -57,7 +57,7 @@ const handleWait = async date => {
 
 const start = async () => {
   let stDate = '2017-04-17'
-  for (let d = 0; d <= 0; d++) {
+  for (let d = 0; d <= 400; d++) {
     let date = moment(stDate, 'YYYY-MM-DD')
       .add(d, 'd')
       .format('YYYY-MM-DD')

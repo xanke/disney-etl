@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { openTimeToX, arrayAvg } = require('../lib/util')
 
 exports.dateToRangX = (date, format = 'YYYY-MM-DD', ms = false) => {
   let x = ms ? 'x' : 'X'
@@ -45,4 +46,65 @@ exports.handleWaitHourAvg = (item, waitList) => {
   }
 
   return hourList
+}
+
+// 项目等待时间统计
+exports.handleWaitCount = (item, waitList) => {
+  // 获取运营时间
+  let { startTime, endTime, date } = item
+  let st = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss').format('X')
+  let et = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss').format('X')
+
+  let waitArr = []
+
+  for (let item of waitList) {
+    let [utime, postedWaitMinutes] = item
+    if (st < utime && utime < et) {
+      waitArr.push(postedWaitMinutes)
+    }
+  }
+
+  let waitMax = waitArr.length > 0 ? Math.max(...waitArr) : 0
+  let waitAvg = parseInt(arrayAvg(waitArr))
+
+  let waitMaxList = []
+  if (waitAvg > 20) {
+    waitMaxList = waitList.filter(item => {
+      return item[1] === waitMax
+    })
+  }
+
+  let countWait = {
+    waitMax,
+    waitAvg,
+    waitMaxList
+  }
+
+  return countWait
+}
+
+exports.startTaskDate = async (date, fn) => {
+  if (!date) date = moment().format('YYYY-MM-DD')
+
+  if (date) {
+    date = date.split(',')
+
+    if (date.length == 1) {
+      date = date[0]
+      await handleWait(date)
+    } else {
+      let st = date[0]
+      let et = date[1]
+
+      let d = 0
+      // 循环至结束
+      while (date !== et) {
+        date = moment(st, 'YYYY-MM-DD')
+          .add(d, 'd')
+          .format('YYYY-MM-DD')
+        await fn(date)
+        d++
+      }
+    }
+  }
 }

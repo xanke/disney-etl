@@ -8,6 +8,16 @@ exports.dateToRangX = (date, format = 'YYYY-MM-DD') => {
   return [st, et]
 }
 
+exports.handleWaitArr = (arr, utime) => {
+  let { fastPass, status, postedWaitMinutes = 0 } = arr
+  let waitArr = [utime, status, postedWaitMinutes]
+  if (fastPass) {
+    let { startTime = '', endTime = '', available } = fastPass
+    waitArr.push(available, startTime, endTime)
+  }
+  return waitArr
+}
+
 exports.getSchedulesByDate = (schedules, date) => {
   let _schedules = []
 

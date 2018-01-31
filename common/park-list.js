@@ -28,7 +28,8 @@ const parkList = [
     id: 'shdr',
     lang: 'CN',
     local: 'shanghai',
-    utc: 8
+    utc: 8,
+    disneyLand: 'desShanghaiDisneyland'
   }
 ]
 

@@ -5,6 +5,7 @@ const stageAttractions = require('./etl/explorer-service/stage-attractions')
 const stageWaitTimes = require('./etl/explorer-service/stage-wait-times')
 const attractions = require('./etl/explorer-service/attractions')
 const waitCount = require('./etl/explorer-service/wait-count')
+const parkCount = require('./etl/explorer-service/park-count')
 
 program
   .version('0.1.0')
@@ -17,10 +18,6 @@ const start = async () => {
   let { fn, date, local } = program
   let promises = []
 
-  if (fn === 'wait-count') {
-    promises.push(Etl(waitCount, date, local))
-  }
-
   if (fn === 'stage-wait-times') {
     promises.push(Etl(stageWaitTimes, date, 'shanghai'))
   }
@@ -31,6 +28,14 @@ const start = async () => {
 
   if (fn === 'attractions') {
     promises.push(Etl(attractions, date, local))
+  }
+
+  if (fn === 'wait-count') {
+    promises.push(Etl(waitCount, date, local))
+  }
+
+  if (fn === 'park-count') {
+    promises.push(Etl(parkCount, date, local))
   }
 
   let results = await Promise.all(promises)

@@ -35,9 +35,9 @@ const start = async conf => {
         fastPassStartTime
       } = element
 
-      waitList.push([utime, postedWaitMinutes, status])
+      waitList.push([utime * 1000, postedWaitMinutes, status])
       if (fastPass) {
-        fpList.push([utime, fastPassStartTime])
+        fpList.push([utime * 1000, fastPassStartTime])
       }
     })
 

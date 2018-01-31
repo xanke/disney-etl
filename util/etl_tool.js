@@ -2,15 +2,27 @@ const moment = require('moment')
 const parkList = require('../common/park-list')
 const { openTimeToX, arrayAvg } = require('../lib/util')
 const { utcDate } = require('../common/api_tool')
-exports.dateToRangX = (date, format = 'YYYY-MM-DD', ms = false) => {
-  let x = ms ? 'x' : 'X'
-  let st = parseInt(moment(date, format).format(x))
-  if (ms) {
-    et = st + 86400000 - 1
-  } else {
-    et = st + 86400 - 1
-  }
+exports.dateToRangX = (date, format = 'YYYY-MM-DD') => {
+  let st = parseInt(moment(date, format).format('X'))
+  et = st + 86400 - 1
   return [st, et]
+}
+
+exports.getSchedulesByDate = (schedules, date) => {
+  let _schedules = []
+
+  schedules.forEach(arr => {
+    if (arr.date === date) {
+      let { startTime, endTime } = arr
+      arr.startX = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss').format(
+        'x'
+      )
+      arr.endX = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
+      _schedules.push(arr)
+    }
+  })
+
+  return _schedules
 }
 
 // 计算项目每小时平均值
@@ -33,8 +45,8 @@ exports.handleWaitHourAvg = (item, waitList) => {
     let len = 0
     let num = 0
     waitList.forEach(arr => {
-      let [utime, postedWaitMinutes = 0, status] = arr
-      let h = parseInt(moment(utime * 1000, 'x').format('H'))
+      let [utime, postedWaitMinutes = 0] = arr
+      let h = parseInt(moment(utime, 'x').format('H'))
       if (h === i) {
         num += postedWaitMinutes
         len++
@@ -53,8 +65,8 @@ exports.handleWaitHourAvg = (item, waitList) => {
 exports.handleWaitCount = (item, waitList) => {
   // 获取运营时间
   let { startTime, endTime, date } = item
-  let st = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss').format('X')
-  let et = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss').format('X')
+  let st = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
+  let et = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
 
   let waitArr = []
 

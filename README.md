@@ -7,24 +7,7 @@ Disney数据清洗和Api服务
 ```shell
 # node start
 
-# -m 模式
-# -l 地区，不填则处理所有
-# -s 开始时间
-# -e 结束时间
-
-#实时信息处理，实时预测
--m 'realtime' -l 'shanghai'
-
-#每日信息处理，日预测，日统计，乐园整体统计
--m 'day' -l 'shanghai'
-
-#信息维护/重置数据/预测数据
--m 'etl' -l 'shanghai' -s '20170101' -e '20171231'
-
 ```
-
-
-
 
 ### 乐园信息获取
 GET /info

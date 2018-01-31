@@ -2,6 +2,10 @@ const program = require('commander')
 
 const activitiesSchedules = require('./etl/explorer-service/ancestor-activities-schedules')
 
+const stageAttractions = require('./etl/explorer-service/stage-attractions')
+const stageWaitTimes = require('./etl/explorer-service/stage-wait-times')
+
+
 program
   .version('0.1.0')
   .option('-f, --fn [value]', 'Add Fn')
@@ -11,7 +15,10 @@ const start = async () => {
   let { fn } = program
   let promises = []
 
-  promises.push(activitiesSchedules())
+  // promises.push(activitiesSchedules())
+
+  // promises.push(stageAttractions())
+  promises.push(stageWaitTimes())
 
   let results = await Promise.all(promises)
   console.log(results)
@@ -20,10 +27,3 @@ const start = async () => {
 }
 
 start()
-
-// 每日基本信息入库
-// 实时排队信息入库
-// 每日统计
-// 历史数据分析
-// -s 20170101 -e 20180101 -l shanghai
-

@@ -8,8 +8,12 @@ module.exports = {
     return DsAttraction.findOne(data).exec()
   },
   update: async (find, data) => {
-    return DsAttraction.update(find, data, {
-      upsert: true
-    }).exec()
+    return DsAttraction.update(
+      find,
+      { $set: data },
+      {
+        upsert: true
+      }
+    ).exec()
   }
 }

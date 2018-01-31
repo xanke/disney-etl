@@ -1,10 +1,13 @@
 // mysql版本项目数据插入
 const DsAttractionModel = require('../../models/ds_attraction')
 const StageInfoModel = require('../../models/stage_info')
-const moment = require('moment')
+const Logs = require('../../util/logs')
 
-const handleEtl = async date => {
-  let data = await StageInfoModel.getInfoByUtime(utime)
+let Name = 'Stage-Attraction'
+
+const start = async conf => {
+  let { date, local } = conf
+  let data = await StageInfoModel.getInfoByDate(date)
 
   for (let item of data) {
     let { name: id, type, start_time, end_time, status } = item
@@ -13,7 +16,7 @@ const handleEtl = async date => {
     if (type === 2) {
       let update = {
         id,
-        local: 'shanghai',
+        local,
         date,
         status,
         startTime: start_time,
@@ -23,15 +26,12 @@ const handleEtl = async date => {
       let find = {
         id,
         date,
-        local: 'shanghai'
+        local
       }
       await DsAttractionModel.update(find, update)
     }
   }
-}
-
-const start = async date => {
-  await handleEtl(date)
+  return Logs.msg(Name, 'OK', conf)
 }
 
 module.exports = start

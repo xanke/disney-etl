@@ -1,9 +1,11 @@
 const Db = require('../lib/mysql')
 const { dateToRangX } = require('../util/etl_tool')
+const moment = require('moment')
 
 module.exports = {
   // 根据日期获取乐园信息
-  getInfoByUtime: async utime => {
+  getInfoByDate: async date => {
+    let utime = moment(date, 'YYYY-MM-DD').format('X')
     return new Promise((resolve, reject) => {
       Db.query(
         `SELECT * FROM db_disney_info WHERE utime = ${utime}`,

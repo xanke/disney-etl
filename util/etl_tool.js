@@ -13,8 +13,6 @@ exports.dateToRangX = (date, format = 'YYYY-MM-DD', ms = false) => {
   return [st, et]
 }
 
-
-
 // 计算项目每小时平均值
 exports.handleWaitHourAvg = (item, waitList) => {
   let hourList = []
@@ -77,11 +75,11 @@ exports.handleWaitCount = (item, waitList) => {
     })
   }
 
-  let countWait = {
+  let waitCount = {
     waitMax,
     waitAvg,
     waitMaxList
   }
 
-  return countWait
+  return waitCount
 }

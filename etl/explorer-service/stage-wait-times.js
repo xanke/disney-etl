@@ -1,19 +1,20 @@
 // mysql版本项目数据插入
 const DsAttractionModel = require('../../models/ds_attraction')
 const StageInfoModel = require('../../models/stage_info')
-const moment = require('moment')
-
+const Logs = require('../../util/logs')
 const { handleWaitHourAvg } = require('../../util/etl_tool')
 const { removeProperty } = require('../../util/util')
 
-const handleWait = async date => {
-  let data, find
+let Name = 'Stage-Wait-Times'
 
-  find = {
-    local: 'shanghai',
+const start = async conf => {
+  let { date, local } = conf
+  let data
+
+  let find = {
+    local,
     date
   }
-
   data = await DsAttractionModel.find(find)
 
   // 项目列表循环
@@ -52,17 +53,7 @@ const handleWait = async date => {
     find.id = id
     await DsAttractionModel.update(find, update)
   }
-  console.log(date, 'ok')
-}
-
-const start = async () => {
-  let stDate = '2017-04-17'
-  for (let d = 0; d <= 400; d++) {
-    let date = moment(stDate, 'YYYY-MM-DD')
-      .add(d, 'd')
-      .format('YYYY-MM-DD')
-    await handleWait(date)
-  }
+  return Logs.msg(Name, 'OK', conf)
 }
 
 module.exports = start

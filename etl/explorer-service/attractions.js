@@ -1,39 +1,58 @@
-// mysql版本项目数据插入
+const ScanSchedulesModel = require('../../models/scan_schedules')
 const DsAttractionModel = require('../../models/ds_attraction')
-const StageInfoModel = require('../../models/stage_info')
-const moment = require('moment')
+const { lineToObject } = require('../../common/api_tool')
+const Logs = require('../../util/logs')
 
-const handleInfo = async utime => {
-  let date = moment(utime * 1000, 'x').format('YYYY-MM-DD')
+let Name = 'Attraction'
 
-  let data = await StageInfoModel.getInfoByUtime(utime)
+const start = async conf => {
+  let { local, date } = conf
+  let find = { local, date }
+  let data = await ScanSchedulesModel.find(find)
+
+  if (data.length === 0) {
+    return Logs.msg(Name, 'NO-DATA', conf)
+  }
+
+  let attractions = []
 
   for (let item of data) {
-    let { name: id, type, start_time, end_time, status } = item
+    let activities = item.body.activities
+    // 遍历项目
+    for (let item of activities) {
+      let { id } = item
+      id = lineToObject(id)
 
-    // 读取游乐项目
-    if (type === 2) {
-      let update = {
-        id,
-        local: 'shanghai',
-        date,
-        status,
-        startTime: start_time,
-        endTime: end_time
-      }
+      if (id.entityType == 'Attraction') {
+        let _schedules = []
 
-      let find = {
-        id,
-        date,
-        local: 'shanghai'
+        if (item.schedule && item.schedule.schedules) {
+          let schedules = item.schedule.schedules
+
+          schedules.forEach(arr => {
+            if (arr.date === date) {
+              _schedules.push(arr)
+            }
+          })
+        }
+        // 与当天时间表合并
+        Object.assign(item, _schedules[0])
+
+        // 项目状态type -> status
+        if (item.type) {
+          item.status = item.type
+          delete item.type
+        }
+        delete item.timeZone
+
+        find.id = id['__id__']
+        Object.assign(item, find)
+
+        await DsAttractionModel.update(find, item)
       }
-      await DsAttractionModel.update(find, update)
     }
   }
-}
-
-const start = async () => {
-  await handleInfo(date)
+  return Logs.msg(Name, 'OK', conf)
 }
 
 module.exports = start

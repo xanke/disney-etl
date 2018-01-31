@@ -3,9 +3,7 @@ const DsAttractionModel = require('../../models/ds_attraction')
 const StageInfoModel = require('../../models/stage_info')
 const moment = require('moment')
 
-const handleInfo = async utime => {
-  let date = moment(utime * 1000, 'x').format('YYYY-MM-DD')
-
+const handleEtl = async date => {
   let data = await StageInfoModel.getInfoByUtime(utime)
 
   for (let item of data) {
@@ -32,12 +30,8 @@ const handleInfo = async utime => {
   }
 }
 
-const start = async () => {
-  let start = 1492358400 // 20170417
-  for (let d = 0; d <= 400; d++) {
-    let utime = start + 86400 * d
-    await handleInfo(utime)
-  }
+const start = async date => {
+  await handleEtl(date)
 }
 
 module.exports = start

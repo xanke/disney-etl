@@ -1,6 +1,7 @@
 const moment = require('moment')
+const parkList = require('../common/park-list')
 const { openTimeToX, arrayAvg } = require('../lib/util')
-
+const { utcDate } = require('../common/api_tool')
 exports.dateToRangX = (date, format = 'YYYY-MM-DD', ms = false) => {
   let x = ms ? 'x' : 'X'
   let st = parseInt(moment(date, format).format(x))
@@ -11,6 +12,8 @@ exports.dateToRangX = (date, format = 'YYYY-MM-DD', ms = false) => {
   }
   return [st, et]
 }
+
+
 
 // 计算项目每小时平均值
 exports.handleWaitHourAvg = (item, waitList) => {
@@ -81,30 +84,4 @@ exports.handleWaitCount = (item, waitList) => {
   }
 
   return countWait
-}
-
-exports.startTaskDate = async (date, fn) => {
-  if (!date) date = moment().format('YYYY-MM-DD')
-
-  if (date) {
-    date = date.split(',')
-
-    if (date.length == 1) {
-      date = date[0]
-      await handleWait(date)
-    } else {
-      let st = date[0]
-      let et = date[1]
-
-      let d = 0
-      // 循环至结束
-      while (date !== et) {
-        date = moment(st, 'YYYY-MM-DD')
-          .add(d, 'd')
-          .format('YYYY-MM-DD')
-        await fn(date)
-        d++
-      }
-    }
-  }
 }

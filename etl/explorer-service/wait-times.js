@@ -9,7 +9,7 @@ const { removeProperty } = require('../../util/util')
 let Name = 'Wait-Times'
 
 const start = async conf => {
-  let { date, local, option = 'push' } = conf
+  let { date, local, option } = conf
   let data
 
   let find = {
@@ -28,7 +28,7 @@ const start = async conf => {
   attData.forEach(item => {
     attWaitList[item.id] = []
     attFpList[item.id] = []
-    if (item.utime) utime = item.utime
+    if (item.utime && option === 'push') utime = item.utime
   })
 
   find = {

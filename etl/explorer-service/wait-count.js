@@ -1,5 +1,9 @@
 const DsAttractionModel = require('../../models/ds_attraction')
-const { handleWaitCount, startTaskDate } = require('../../util/etl_tool')
+const {
+  handleWaitCount,
+  startTaskDate,
+  handleWaitHourAvg
+} = require('../../util/etl_tool')
 const Logs = require('../../util/logs')
 
 let Name = 'Wait-Count'
@@ -22,8 +26,11 @@ const start = async conf => {
   for (let item of data) {
     let { id, waitList } = item
     if (waitList) {
-      find.id = id
+      console.log(waitList)
       let update = handleWaitCount(item, waitList)
+      update.waitHour = handleWaitHourAvg(item, waitList)
+
+      find.id = id
       await DsAttractionModel.update(find, update)
     }
   }

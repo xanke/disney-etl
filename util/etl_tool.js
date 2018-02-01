@@ -36,7 +36,8 @@ exports.getSchedulesByDate = (schedules, date) => {
 }
 
 // 计算项目每小时平均值
-exports.handleWaitHourAvg = (item, waitList) => {
+exports.handleWaitHourAvg = (item, waitList, conf) => {
+  let { utc } = conf
   let hourList = []
   let wList = []
 
@@ -47,8 +48,16 @@ exports.handleWaitHourAvg = (item, waitList) => {
   // 获取运营时间小时值
   let { startTime, endTime } = item
 
-  let sh = parseInt(moment(startTime, 'hh:mm:ss').format('H'))
-  let eh = parseInt(moment(endTime, 'hh:mm:ss').format('H'))
+  let sh = parseInt(
+    moment(startTime, 'hh:mm:ss')
+      .utc(utc)
+      .format('H')
+  )
+  let eh = parseInt(
+    moment(endTime, 'hh:mm:ss')
+      .utc(utc)
+      .format('H')
+  )
 
   for (let i = sh; i <= eh; i++) {
     // 样本数量和总和
@@ -72,11 +81,16 @@ exports.handleWaitHourAvg = (item, waitList) => {
 }
 
 // 项目等待时间统计
-exports.handleWaitCount = (item, waitList) => {
+exports.handleWaitCount = (item, waitList, conf) => {
+  let { utc } = conf
   // 获取运营时间
   let { startTime, endTime, date } = item
-  let st = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
-  let et = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
+  let st = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss')
+    .utc(utc)
+    .format('x')
+  let et = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss')
+    .utc(utc)
+    .format('x')
   console.log(st, et)
 
   let waitArr = []

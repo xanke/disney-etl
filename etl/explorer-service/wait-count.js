@@ -26,8 +26,8 @@ const start = async conf => {
   for (let item of data) {
     let { id, waitList } = item
     if (waitList) {
-      let update = handleWaitCount(item, waitList)
-      update.waitHour = handleWaitHourAvg(item, waitList)
+      let update = handleWaitCount(item, waitList, conf)
+      update.waitHour = handleWaitHourAvg(item, waitList, conf)
 
       find.id = id
       await DsAttractionModel.update(find, update)

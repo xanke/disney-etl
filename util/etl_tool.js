@@ -18,16 +18,19 @@ exports.handleWaitArr = (arr, utime) => {
   return waitArr
 }
 
-exports.getSchedulesByDate = (schedules, date) => {
+exports.getSchedulesByDate = (schedules, date, conf) => {
+  let { utc } = conf
   let _schedules = []
 
   schedules.forEach(arr => {
     if (arr.date === date) {
       let { startTime, endTime } = arr
-      arr.startX = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss').format(
-        'x'
-      )
-      arr.endX = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
+      arr.startX = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss')
+        .utcOffset(utc)
+        .format('x')
+      arr.endX = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss')
+        .utcOffset(utc)
+        .format('x')
       _schedules.push(arr)
     }
   })
@@ -50,12 +53,12 @@ exports.handleWaitHourAvg = (item, waitList, conf) => {
 
   let sh = parseInt(
     moment(startTime, 'hh:mm:ss')
-      .utc(utc)
+      .utcOffset(utc)
       .format('H')
   )
   let eh = parseInt(
     moment(endTime, 'hh:mm:ss')
-      .utc(utc)
+      .utcOffset(utc)
       .format('H')
   )
 
@@ -86,10 +89,10 @@ exports.handleWaitCount = (item, waitList, conf) => {
   // 获取运营时间
   let { startTime, endTime, date } = item
   let st = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss')
-    .utc(utc)
+    .utcOffset(utc)
     .format('x')
   let et = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss')
-    .utc(utc)
+    .utcOffset(utc)
     .format('x')
 
   let waitArr = []

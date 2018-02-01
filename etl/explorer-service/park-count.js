@@ -16,12 +16,18 @@ const start = async conf => {
   let data
 
   // 获取乐园信息
-  data = await ScanSchedulesModel.getByDisneyLand(disneyLand, date, local)
+  let parkData
+  try {
+    data = await ScanSchedulesModel.getByDisneyLand(disneyLand, date, local)
+    let schedules = getSchedulesByDate(data.schedule.schedules, date, conf)
+    parkData = schedules[0]
+  } catch (e) {
+    data = await DsAttractionModel.getParkSchedules(date, conf)
+    parkData = data
+  }
 
   // 获取当天开放时间
-  let schedules = getSchedulesByDate(data.schedule.schedules, date)
-  let { startX, endX } = schedules[0]
-  let parkData = schedules[0]
+  let { startX, endX } = parkData
 
   let find = {
     local,
@@ -46,15 +52,16 @@ const start = async conf => {
         openAtt++
       }
       if (waitList && waitList.length > 0) {
-        let waitArr = waitList.map(arr => {
-          let [utime, num] = arr
+        let waitArr = []
+        waitList.forEach(arr => {
+          let [utime, num = 0] = arr
           if (startX < utime && utime < endX) {
-            return num
+            waitArr.push(num)
           }
         })
 
         utimeArr = waitList.map(arr => {
-          let [utime, num] = arr
+          let [utime] = arr
           if (startX < utime && utime < endX) {
             return utime
           }
@@ -66,6 +73,7 @@ const start = async conf => {
 
   let markArr = []
   let markList = []
+  // console.log(waitCube[0])
   for (let key of waitCube[0]) {
     let count = 0
     // 循环所有项目
@@ -87,7 +95,7 @@ const start = async conf => {
     return item[1] === markMax
   })
 
-  let markHour = handleWaitHourAvg(parkData, markList)
+  let markHour = handleWaitHourAvg(parkData, markList, conf)
 
   let update = {
     id: disneyLand,

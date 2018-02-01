@@ -41,7 +41,7 @@ const start = async conf => {
       }
     })
 
-    let hourList = handleWaitHourAvg(item, waitList)
+    let hourList = handleWaitHourAvg(item, waitList, conf)
 
     let update = {
       waitList,

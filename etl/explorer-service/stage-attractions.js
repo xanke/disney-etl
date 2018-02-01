@@ -13,7 +13,7 @@ const start = async conf => {
     let { name: id, type, start_time, end_time, status } = item
 
     // 读取游乐项目
-    if (type === 2) {
+    if (type === 2 || id === 'desShanghaiDisneyland') {
       let update = {
         id,
         local,

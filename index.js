@@ -1,71 +1,53 @@
-const path = require('path')
-const express = require('express')
-const config = require('config-lite')(__dirname)
-const routes = require('./routes')
-const pkg = require('./package')
-const winston = require('winston')
-const expressWinston = require('express-winston')
-const http = require('http')
-const https = require('https')
-const fs = require('fs')
-const app = express()
+const program = require('commander')
+const Etl = require('./etl')
 
-app.use((req, res, next) => {
-  res.retErr = (err, code = 400) => {
-    res.json({ err, code })
+const stageAttractions = require('./etl/explorer-service/stage-attractions')
+const stageWaitTimes = require('./etl/explorer-service/stage-wait-times')
+const attractions = require('./etl/explorer-service/attractions')
+const waitCount = require('./etl/explorer-service/wait-count')
+const waitTimes = require('./etl/explorer-service/wait-times')
+const parkCount = require('./etl/explorer-service/park-count')
+
+program
+  .version('0.1.0')
+  .option('-f, --fn [value]', 'Add Fn')
+  .option('-d, --date [value]', 'Add Date')
+  .option('-l, --local [value]', 'Add Local')
+  .option('-o, --option [value]', 'Add Option')
+  .parse(process.argv)
+
+const start = async () => {
+  let { fn, date, local, option } = program
+  let promises = []
+
+  if (fn === 'stage-wait-times') {
+    promises.push(Etl(stageWaitTimes, date, 'shanghai'))
   }
-  res.retData = data => {
-    res.json(data)
+
+  if (fn === 'stage-attractions') {
+    promises.push(Etl(stageAttractions, date, 'shanghai'))
   }
-  next()
-})
 
-// 路由
-routes(app)
+  if (fn === 'attractions') {
+    promises.push(Etl(attractions, date, local))
+  }
 
-// 正常请求的日志
-// app.use(
-//   expressWinston.logger({
-//     transports: [
-//       new winston.transports.Console({
-//         json: true,
-//         colorize: true
-//       }),
-//       new winston.transports.File({
-//         filename: 'logs/success.log'
-//       })
-//     ]
-//   })
-// )
+  if (fn === 'wait-times') {
+    promises.push(Etl(waitTimes, date, local, option))
+  }
 
-// 错误请求的日志
-// app.use(
-//   expressWinston.errorLogger({
-//     transports: [
-//       new winston.transports.Console({
-//         json: true,
-//         colorize: true
-//       }),
-//       new winston.transports.File({
-//         filename: 'logs/error.log'
-//       })
-//     ]
-//   })
-// )
+  if (fn === 'wait-count') {
+    promises.push(Etl(waitCount, date, local))
+  }
 
-//错误返回
-app.use((err, req, res, next) => {
-  res.retErr(err.message)
-})
+  if (fn === 'park-count') {
+    promises.push(Etl(parkCount, date, local))
+  }
 
-const key = fs.readFileSync('./cert/privatekey.pem', 'utf8')
-const cert = fs.readFileSync('./cert/certificate.crt', 'utf8')
-const credentials = { key, cert }
-if (process.env.NODE_ENV === 'production') {
-  http.createServer(app).listen(17101)
-} else {
-  http.createServer(app).listen(8013)
-  // var httpsServer = https.createServer(credentials, app)
-  // httpsServer.listen(443)
+  let results = await Promise.all(promises)
+  console.log(results)
+
+  process.exit()
 }
-console.log('Disney-ETL')
+
+start()

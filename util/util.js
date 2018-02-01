@@ -37,7 +37,7 @@ exports.to = promise => {
     .catch(err => [err])
 }
 
-function removeProperty(object) {
+const removeProperty = (object) => {
   for (let key in object) {
     let value = object[key]
     if (value === '' || value === undefined) {
@@ -54,4 +54,12 @@ exports.md5 = str => {
     .update(str.toString())
     .digest('hex')
   return ret
+}
+
+exports.arrayAvg = arr => {
+  let avg = 0
+  if (arr.length > 0) {
+    avg = arr.reduce((a, b) => a + b, 0) / arr.length
+  }
+  return avg
 }

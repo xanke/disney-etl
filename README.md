@@ -5,7 +5,11 @@ Disney数据清洗和Api服务
 ### 乐园信息处理
 
 ```shell
-# node start
+node start
+
+-f 方法
+-d 日期
+-l 位置
 
 ```
 

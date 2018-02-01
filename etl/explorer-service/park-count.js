@@ -6,7 +6,7 @@ const ScanSchedulesModel = require('../../models/scan_schedules')
 const DsAttractionModel = require('../../models/ds_attraction')
 const DsParkModel = require('../../models/ds_park')
 const { getSchedulesByDate, handleWaitHourAvg } = require('../../util/etl_tool')
-const { openTimeToX, arrayAvg } = require('../../lib/util')
+const { openTimeToX, arrayAvg } = require('../../util/util')
 const Logs = require('../../util/logs')
 
 let Name = 'Park-Count'
@@ -41,28 +41,26 @@ const start = async conf => {
   for (let item of data) {
     let { waitList, status } = item
 
-    if (!waitList) {
-      return Logs.msg(Name, 'NO-waitList', conf)
-    }
-
-    if (status === 'Operating') {
-      openAtt++
-    }
     if (waitList && waitList.length > 0) {
-      let waitArr = waitList.map(arr => {
-        let [utime, num] = arr
-        if (startX < utime && utime < endX) {
-          return num
-        }
-      })
+      if (status === 'Operating') {
+        openAtt++
+      }
+      if (waitList && waitList.length > 0) {
+        let waitArr = waitList.map(arr => {
+          let [utime, num] = arr
+          if (startX < utime && utime < endX) {
+            return num
+          }
+        })
 
-      utimeArr = waitList.map(arr => {
-        let [utime, num] = arr
-        if (startX < utime && utime < endX) {
-          return utime
-        }
-      })
-      waitCube.push(waitArr)
+        utimeArr = waitList.map(arr => {
+          let [utime, num] = arr
+          if (startX < utime && utime < endX) {
+            return utime
+          }
+        })
+        waitCube.push(waitArr)
+      }
     }
   }
 
@@ -106,14 +104,17 @@ const start = async conf => {
     // 天气数据合并
     data = await WeatherService.search('shanghai', date, date)
     data = data[0]
-    let weather = {
-      wea: data.wea,
-      wind: data.wd,
-      temMax: data.max,
-      temMin: data.min,
-      aqi: data.aqi
+
+    if (data) {
+      let weather = {
+        wea: data.wea,
+        wind: data.wd,
+        temMax: data.max,
+        temMin: data.min,
+        aqi: data.aqi
+      }
+      Object.assign(update, weather)
     }
-    Object.assign(update, weather)
 
     // 客流量数据合并
     data = await TravelService.flowDay('102', date)

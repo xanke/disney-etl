@@ -1,6 +1,6 @@
 const moment = require('moment')
 const parkList = require('../common/park-list')
-const { openTimeToX, arrayAvg } = require('../lib/util')
+const { openTimeToX, arrayAvg } = require('../util/util')
 const { utcDate } = require('../common/api_tool')
 exports.dateToRangX = (date, format = 'YYYY-MM-DD') => {
   let st = parseInt(moment(date, format).format('X'))

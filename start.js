@@ -13,10 +13,11 @@ program
   .option('-f, --fn [value]', 'Add Fn')
   .option('-d, --date [value]', 'Add Date')
   .option('-l, --local [value]', 'Add Local')
+  .option('-o, --option [value]', 'Add Option')
   .parse(process.argv)
 
 const start = async () => {
-  let { fn, date, local } = program
+  let { fn, date, local, option } = program
   let promises = []
 
   if (fn === 'stage-wait-times') {
@@ -32,7 +33,7 @@ const start = async () => {
   }
 
   if (fn === 'wait-times') {
-    promises.push(Etl(waitTimes, date, local))
+    promises.push(Etl(waitTimes, date, local, option))
   }
 
   if (fn === 'wait-count') {

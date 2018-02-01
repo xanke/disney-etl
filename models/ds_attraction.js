@@ -15,5 +15,14 @@ module.exports = {
         upsert: true
       }
     ).exec()
+  },
+  pushList: async (find, data, utime) => {
+    return DsAttraction.update(
+      find,
+      { $set: { utime }, $push: data },
+      {
+        upsert: true
+      }
+    ).exec()
   }
 }

@@ -77,6 +77,7 @@ exports.handleWaitCount = (item, waitList) => {
   let { startTime, endTime, date } = item
   let st = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
   let et = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
+  console.log(st, et)
 
   let waitArr = []
 

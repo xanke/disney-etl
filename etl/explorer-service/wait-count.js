@@ -26,7 +26,6 @@ const start = async conf => {
   for (let item of data) {
     let { id, waitList } = item
     if (waitList) {
-      console.log(waitList)
       let update = handleWaitCount(item, waitList)
       update.waitHour = handleWaitHourAvg(item, waitList)
 

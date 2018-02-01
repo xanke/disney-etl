@@ -137,7 +137,7 @@ const start = async conf => {
 
       let flowMax = Math.max(...flowArr)
       let flowAvg = Math.round(arrayAvg(flowArr))
-      let flowHour = handleWaitHourAvg(parkData, flowList)
+      let flowHour = handleWaitHourAvg(parkData, flowList, conf)
 
       let flow = {
         flowList,

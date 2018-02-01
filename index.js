@@ -20,12 +20,12 @@ const start = async () => {
   let { fn, date, local, option } = program
   let promises = []
 
-  if (fn === 'stage-wait-times') {
-    promises.push(Etl(stageWaitTimes, date, 'shanghai'))
-  }
-
   if (fn === 'stage-attractions') {
     promises.push(Etl(stageAttractions, date, 'shanghai'))
+  }
+
+  if (fn === 'stage-wait-times') {
+    promises.push(Etl(stageWaitTimes, date, 'shanghai'))
   }
 
   if (fn === 'attractions') {

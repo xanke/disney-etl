@@ -53,17 +53,12 @@ const start = async conf => {
       }
       if (waitList && waitList.length > 0) {
         let waitArr = []
+        utimeArr = []
         waitList.forEach(arr => {
           let [utime, num = 0] = arr
           if (startX < utime && utime < endX) {
             waitArr.push(num)
-          }
-        })
-
-        utimeArr = waitList.map(arr => {
-          let [utime] = arr
-          if (startX < utime && utime < endX) {
-            return utime
+            utimeArr.push(utime)
           }
         })
         waitCube.push(waitArr)
@@ -73,16 +68,16 @@ const start = async conf => {
 
   let markArr = []
   let markList = []
-  // console.log(waitCube[0])
-  for (let key of waitCube[0]) {
-    let count = 0
+
+  for (let k = 0; k < utimeArr.length; k++) {
     // 循环所有项目
+    let count = 0
     for (let arr of waitCube) {
-      count += arr[key]
+      count += arr[k]
     }
     markArr.push(count)
 
-    let utime = utimeArr[key]
+    let utime = utimeArr[k]
     let avg = Math.round(count / openAtt)
     markList.push([utime, count, avg])
   }

@@ -22,12 +22,21 @@ const start = async conf => {
     let schedules = getSchedulesByDate(data.schedule.schedules, date, conf)
     parkData = schedules[0]
   } catch (e) {
-    data = await DsAttractionModel.getParkSchedules(date, conf)
-    parkData = data
+    console.log('get_schedules 无数据')
+  }
+
+  if (!parkData) {
+    try {
+      data = await DsAttractionModel.getParkSchedules(date, conf)
+      parkData = data
+    } catch (e) {
+      console.log('stage 无数据')
+      return
+    }
   }
 
   // 获取当天开放时间
-  let { startX, endX } = parkData
+  let { startX, endX, startTime, endTime } = parkData
 
   let find = {
     local,
@@ -100,7 +109,9 @@ const start = async conf => {
     markMax,
     markAvg,
     markMaxList,
-    markHour
+    markHour,
+    startTime,
+    endTime
   }
 
   if (local === 'shanghai') {

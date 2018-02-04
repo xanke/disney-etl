@@ -34,7 +34,7 @@ node
 |----|-----------|
 |ds_park|清洗后的乐园整体信息|
 |ds_attractions|清洗后的游乐项目信息|
-|ds_destinations|清洗后的游乐项目信息|
+|scan_destinations|乐园信息字典|
 |scan_schedules|乐园开放时间表|
 |scan_calendars|乐园演出信息|
 |scan_waits|原始游乐项目等待时间信息|

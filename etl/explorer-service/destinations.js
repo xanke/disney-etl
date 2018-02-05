@@ -20,6 +20,8 @@ const start = async conf => {
     let { __id__: id, entityType } = oid
     entityType = entityType.toLowerCase()
 
+    delete item.cacheId
+
     if (attGroupList[entityType]) {
       attGroupList[entityType].push(item)
     } else {

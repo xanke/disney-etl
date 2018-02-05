@@ -10,14 +10,38 @@ let Name = 'Destinations'
 const start = async conf => {
   let { local } = conf
   let data = await ScanDestinationsModel.getByLocal(local)
-  let str_json = JSON.stringify(data)
 
-  let key=`explorer-service/destinations/${local}`;
-  await updateToQiniu(key, str_json)
+  let { added: attList, facetGroups } = data
+
+  // 按类型分组
+  let attGroupList = {}
+  attList.forEach(item => {
+    let oid = lineToObject(item.id)
+    let { __id__: id, entityType } = oid
+    entityType = entityType.toLowerCase()
+
+    if (attGroupList[entityType]) {
+      attGroupList[entityType].push(item)
+    } else {
+      attGroupList[entityType] = [item]
+    }
+  })
+
+  let keyBase = 'explorer-service/destinations'
+  let key = `${keyBase}/${local}/facet-groups`
+  await updateToQiniu(key, facetGroups)
+
+  for (let entityType in attGroupList) {
+    let item = attGroupList[entityType]
+    let key = `${keyBase}/${local}/${entityType}`
+    await updateToQiniu(key, item)
+  }
+
   return Logs.msg(Name, 'OK', conf)
 }
 
-const updateToQiniu = (key, str_json) => {
+const updateToQiniu = (key, data) => {
+  let str_json = JSON.stringify(data)
   return new Promise((resolve, reject) => {
     let uploadToken = getUploadToken(key)
     var qiniuConfig = new qiniu.conf.Config()
@@ -38,7 +62,6 @@ const updateToQiniu = (key, str_json) => {
       }
       if (respInfo.statusCode == 200) {
         console.log(respBody)
-
         resolve(respBody)
       } else {
         console.log(respInfo.statusCode)
@@ -49,7 +72,8 @@ const updateToQiniu = (key, str_json) => {
   })
 }
 
-const getUploadToken = (key) => {
+// 获取上传token
+const getUploadToken = key => {
   let accessKey = config.qiniu_ak
   let secretKey = config.qiniu_sk
   let mac = new qiniu.auth.digest.Mac(accessKey, secretKey)

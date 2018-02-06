@@ -21,6 +21,7 @@ node
 */10 * * * * sudo node /data/node/disney-etl -f park-count -l shanghai
 
 0 */2 * * * sudo node /data/node/disney-etl -f attractions -l shanghai
+0 */2 * * * sudo node /data/node/disney-etl -f destinations -l shanghai
 ```
 
 ### 数据下载

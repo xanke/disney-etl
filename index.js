@@ -25,20 +25,20 @@ const start = async () => {
   let promises = []
 
   if (fn === 'all') {
-    console.log('Disney-ETL')
+    console.log('Disney-ETL 0.3.1')
 
     schedule.scheduleJob('*/2 * * * *', async () => {
-      await Etl(waitTimes, date, 'shanghai')
+      await Etl(waitTimes, null, 'shanghai', 'push')
     })
 
     schedule.scheduleJob('*/10 * * * *', async () => {
-      await Etl(waitCount, date, 'shanghai')
-      await Etl(parkCount, date, 'shanghai')
+      await Etl(waitCount, null, 'shanghai')
+      await Etl(parkCount, null, 'shanghai')
     })
 
     schedule.scheduleJob('2 */2 * * *', async () => {
-      await Etl(attractions, date, 'shanghai')
-      await Etl(destinations, date, 'shanghai')
+      await Etl(attractions, null, 'shanghai')
+      await Etl(destinations, null, 'shanghai')
     })
   } else {
     if (fn === 'stage-attractions') {

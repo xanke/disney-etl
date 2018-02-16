@@ -34,3 +34,16 @@ node
 |scan_schedules|乐园开放时间表|
 |scan_calendars|乐园演出信息|
 |scan_waits|原始游乐项目等待时间信息|
+
+
+### 持续集成
+
+```
+docker stop disney-etl \
+&& docker rm disney-etl \
+&& cd /data/jenkins/workspace/disney-etl \
+&& docker build -t disney-etl . \
+&& docker run -d --name disney-etl \
+--mount type=bind,source=/data/config/disney-etl,target=/app/config \
+disney-etl node index -f all
+```

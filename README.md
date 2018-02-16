@@ -24,11 +24,6 @@ node
 0 */2 * * * sudo node /data/node/disney-etl -f destinations -l shanghai
 ```
 
-### 数据下载
-现分享自2017年4月起至2018年2月上海迪士尼乐园实时排队数据，欢迎大家学习交流。
-
-**请联系WeChat xank88 获取**
-
 ### 数据表名称
 
 |名称|说明|

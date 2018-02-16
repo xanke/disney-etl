@@ -1,5 +1,6 @@
 const program = require('commander')
 const Etl = require('./etl')
+const schedule = require('node-schedule')
 
 const stageAttractions = require('./etl/stage/stage-attractions')
 const stageWaitTimes = require('./etl/stage/stage-wait-times')
@@ -23,38 +24,56 @@ const start = async () => {
   let { fn, date, local, option } = program
   let promises = []
 
-  if (fn === 'stage-attractions') {
-    promises.push(Etl(stageAttractions, date, 'shanghai'))
+  if (fn === 'all') {
+    console.log('Disney-ETL')
+
+    schedule.scheduleJob('*/2 * * * *', async () => {
+      await Etl(waitTimes, date, 'shanghai')
+    })
+
+    schedule.scheduleJob('*/10 * * * *', async () => {
+      await Etl(waitCount, date, 'shanghai')
+      await Etl(parkCount, date, 'shanghai')
+    })
+
+    schedule.scheduleJob('2 */2 * * *', async () => {
+      await Etl(attractions, date, 'shanghai')
+      await Etl(destinations, date, 'shanghai')
+    })
+  } else {
+    if (fn === 'stage-attractions') {
+      promises.push(Etl(stageAttractions, date, 'shanghai'))
+    }
+
+    if (fn === 'stage-wait-times') {
+      promises.push(Etl(stageWaitTimes, date, 'shanghai'))
+    }
+
+    if (fn === 'attractions') {
+      promises.push(Etl(attractions, date, local))
+    }
+
+    if (fn === 'destinations') {
+      promises.push(Etl(destinations, date, local))
+    }
+
+    if (fn === 'wait-times') {
+      promises.push(Etl(waitTimes, date, local, option))
+    }
+
+    if (fn === 'wait-count') {
+      promises.push(Etl(waitCount, date, local))
+    }
+
+    if (fn === 'park-count') {
+      promises.push(Etl(parkCount, date, local))
+    }
+
+    let results = await Promise.all(promises)
+    console.log(results)
+
+    process.exit()
   }
-
-  if (fn === 'stage-wait-times') {
-    promises.push(Etl(stageWaitTimes, date, 'shanghai'))
-  }
-
-  if (fn === 'attractions') {
-    promises.push(Etl(attractions, date, local))
-  }
-
-  if (fn === 'destinations') {
-    promises.push(Etl(destinations, date, local))
-  }
-
-  if (fn === 'wait-times') {
-    promises.push(Etl(waitTimes, date, local, option))
-  }
-
-  if (fn === 'wait-count') {
-    promises.push(Etl(waitCount, date, local))
-  }
-
-  if (fn === 'park-count') {
-    promises.push(Etl(parkCount, date, local))
-  }
-
-  let results = await Promise.all(promises)
-  console.log(results)
-
-  process.exit()
 }
 
 start()

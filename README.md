@@ -13,17 +13,6 @@ node
 -o #方法 (仅wait-times方法有效，push / update：push插入数据，update覆盖)
 ```
 
-```cron
-# Disney-Etl
-
-*/2 * * * * sudo node /data/node/disney-etl -f wait-times -l shanghai -o push
-*/5 * * * * sudo node /data/node/disney-etl -f wait-count -l shanghai
-*/10 * * * * sudo node /data/node/disney-etl -f park-count -l shanghai
-
-0 */2 * * * sudo node /data/node/disney-etl -f attractions -l shanghai
-0 */2 * * * sudo node /data/node/disney-etl -f destinations -l shanghai
-```
-
 ### 数据表名称
 
 |名称|说明|
@@ -36,14 +25,11 @@ node
 |scan_waits|原始游乐项目等待时间信息|
 
 
-### 持续集成
+### 完成进度
 
-```
-docker stop disney-etl \
-&& docker rm disney-etl \
-&& cd /data/jenkins/workspace/disney-etl \
-&& docker build -t disney-etl . \
-&& docker run -d --name disney-etl \
---mount type=bind,source=/data/config/disney-etl,target=/app/config \
-disney-etl node index -f all
-```
+- [x] 上海迪士尼乐园
+- [ ] 香港迪士尼乐园
+- [ ] 巴黎迪士尼乐园
+- [ ] 加州迪士尼乐园
+- [ ] 奥兰多迪士尼乐园
+- [ ] 东京迪士尼乐园

@@ -10,20 +10,24 @@ let Name = 'Wait-Times'
 
 const start = async conf => {
   let { date, local, option } = conf
-  let data
+  let data, find
 
-  let find = {
+  find = {
     local,
     date
   }
-  data = await DsAttractionModel.find(find)
-  if (data.length === 0) {
+
+  // 获取项目列表
+  let attData = await DsAttractionModel.find(find)
+
+  if (attData.length === 0) {
     return Logs.msg(Name, 'NO-DATA', conf)
   }
-  let attData = data
+
   let attWaitList = {}
   let attFpList = {}
 
+  // 获取需要开始更新的时间
   let utime = 0
   attData.forEach(item => {
     attWaitList[item.id] = []
@@ -37,44 +41,44 @@ const start = async conf => {
     utime: { $gt: utime }
   }
 
-  data = await ScanWaitModel.find(find)
-
-  let waitData = data
+  let waitData = await ScanWaitModel.find(find)
 
   for (let item of waitData) {
-    let entries = item.body.entries
+    let { entries } = item.body
     utime = item.utime
 
     for (let att of entries) {
       let { id, waitTime } = att
-      id = lineToObject(id)
-      // 提取游乐项目
-      if (id.entityType == 'Attraction') {
-        id = id['__id__']
+      const { entityType, __id__ } = lineToObject(id)
 
-        let { postedWaitMinutes = 0, status } = waitTime
-        let waitArr = [utime, postedWaitMinutes, status]
-        attWaitList[id].push(waitArr)
+      // 判断是否是项目
+      if (entityType !== 'Attraction') continue
+      if (!attWaitList[__id__]) continue
 
-        let push = {
-          waitList: waitArr
+      let { postedWaitMinutes = 0, status } = waitTime
+      let waitArr = [utime, postedWaitMinutes, status]
+      attWaitList[__id__].push(waitArr)
+
+      let push = {
+        waitList: waitArr
+      }
+
+      // 快速通行证判断
+      if (waitTime.fastPass && waitTime.fastPass.available) {
+        let { startTime = '' } = waitTime.fastPass
+        let fpArr = [utime, startTime]
+        attFpList[__id__].push(fpArr)
+        push.fpList = fpArr
+      }
+
+      // 递增模式
+      if (option === 'push') {
+        let find = {
+          date,
+          local,
+          id: __id__
         }
-
-        if (waitTime.fastPass && waitTime.fastPass.available) {
-          let { startTime = '' } = waitTime.fastPass
-          let fpArr = [utime, startTime]
-          attFpList[id].push(fpArr)
-          push.fpList = fpArr
-        }
-
-        if (option === 'push') {
-          let find = {
-            date,
-            local,
-            id
-          }
-          await DsAttractionModel.pushList(find, push, utime)
-        }
+        await DsAttractionModel.pushList(find, push, utime)
       }
     }
   }

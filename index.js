@@ -30,17 +30,22 @@ const start = async () => {
     // 实时等候数据
     schedule.scheduleJob('*/2 * * * *', async () => {
       await Etl(waitTimes, null, 'shanghai', 'push')
+      await Etl(waitTimes, null, 'hongkong', 'push')
     })
 
     // 小时数据合并
     schedule.scheduleJob('*/10 * * * *', async () => {
       await Etl(waitCount, null, 'shanghai')
       await Etl(parkCount, null, 'shanghai')
+
+      await Etl(waitCount, null, 'hongkong')
+      await Etl(parkCount, null, 'hongkong')
     })
 
     // 乐园资料
     schedule.scheduleJob('2 */2 * * *', async () => {
       await Etl(attractions, null, 'shanghai')
+      await Etl(attractions, null, 'hongkong')
 
       // CDN 缓存简介
       await Etl(destinations, null, 'shanghai')
@@ -77,7 +82,6 @@ const start = async () => {
     if (fn === 'ticket-count') {
       promises.push(Etl(ticketCount, date, local))
     }
-
 
     let results = await Promise.all(promises)
     console.log(results)

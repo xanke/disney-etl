@@ -52,14 +52,10 @@ exports.handleWaitHourAvg = (item, waitList, conf) => {
   let { startTime, endTime } = item
 
   let sh = parseInt(
-    moment(startTime, 'hh:mm:ss')
-      .utcOffset(utc)
-      .format('H')
+    moment(startTime, 'hh:mm:ss').format('H')
   )
   let eh = parseInt(
-    moment(endTime, 'hh:mm:ss')
-      .utcOffset(utc)
-      .format('H')
+    moment(endTime, 'hh:mm:ss').format('H')
   )
 
   for (let i = sh; i <= eh; i++) {
@@ -68,7 +64,7 @@ exports.handleWaitHourAvg = (item, waitList, conf) => {
     let num = 0
     waitList.forEach(arr => {
       let [utime, postedWaitMinutes = 0] = arr
-      let h = parseInt(moment(utime, 'x').format('H'))
+      let h = parseInt(moment(utime, 'x').utcOffset(utc).format('H'))
       if (h === i) {
         num += postedWaitMinutes
         len++
@@ -83,22 +79,27 @@ exports.handleWaitHourAvg = (item, waitList, conf) => {
   return hourList
 }
 
+function xToXUTC(time, utc) {
+  let m = moment(time, 'x').format('YYYY-MM-DD hh:mm:ss')
+  m = moment(m, 'YYYY-MM-DD hh:mm:ss').utcOffset(utc).format('YYYY-MM-DD hh:mm:ss')
+  m = moment(m, 'YYYY-MM-DD hh:mm:ss').format('x')
+  return m
+}
+
 // 项目等待时间统计
 exports.handleWaitCount = (item, waitList, conf) => {
   let { utc } = conf
   // 获取运营时间
   let { startTime, endTime, date } = item
-  let st = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss')
-    .utcOffset(utc)
-    .format('x')
-  let et = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss')
-    .utcOffset(utc)
-    .format('x')
+  let st = moment(`${date} ${startTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
+  let et = moment(`${date} ${endTime}`, 'YYYY-MM-DD hh:mm:ss').format('x')
 
   let waitArr = []
 
   for (let item of waitList) {
     let [utime, postedWaitMinutes] = item
+
+    utime = xToXUTC(utime, utc) // moment(utime, 'x').utcOffset(utc).format('x')
     if (st < utime && utime < et) {
       waitArr.push(postedWaitMinutes)
     }

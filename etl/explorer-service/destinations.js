@@ -29,6 +29,7 @@ const start = async conf => {
     }
   })
 
+  // 缓存至七牛
   let keyBase = 'explorer-service/destinations'
   let key = `${keyBase}/${local}/facet-groups`
   await updateToQiniu(key, facetGroups)

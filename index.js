@@ -27,17 +27,22 @@ const start = async () => {
   if (fn === 'all') {
     console.log('Disney-ETL 0.3.1')
 
+    // 实时等候数据
     schedule.scheduleJob('*/2 * * * *', async () => {
       await Etl(waitTimes, null, 'shanghai', 'push')
     })
 
+    // 小时数据合并
     schedule.scheduleJob('*/10 * * * *', async () => {
       await Etl(waitCount, null, 'shanghai')
       await Etl(parkCount, null, 'shanghai')
     })
 
+    // 乐园资料
     schedule.scheduleJob('2 */2 * * *', async () => {
       await Etl(attractions, null, 'shanghai')
+
+      // CDN 缓存简介
       await Etl(destinations, null, 'shanghai')
     })
   } else {

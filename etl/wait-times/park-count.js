@@ -54,7 +54,7 @@ const start = async conf => {
   let utimeArr = []
 
   for (let item of data) {
-    let { waitList, status } = item
+    let { waitList, status, id } = item
 
     if (waitList && waitList.length > 0) {
       if (status === 'Operating') {
@@ -65,6 +65,7 @@ const start = async conf => {
         utimeArr = []
         waitList.forEach(arr => {
           let [utime, num = 0] = arr
+
           if (startX < utime && utime < endX) {
             waitArr.push(num)
             utimeArr.push(utime)
@@ -84,20 +85,23 @@ const start = async conf => {
     for (let arr of waitCube) {
       count += arr[k]
     }
-    markArr.push(count)
 
-    let utime = utimeArr[k]
-    let avg = Math.round(count / openAtt)
-    markList.push([utime, count, avg])
+    if (count >= 0) {
+      markArr.push(count)
+
+      let utime = utimeArr[k]
+      let avg = Math.round(count / openAtt)
+      markList.push([utime, count, avg])
+    }
   }
+
+  // console.log(markArr)
 
   // 获取最高乐园指数
   let markMax = Math.max(...markArr)
-  let markAvg = Math.round(arrayAvg(markArr))
 
-  markMaxList = markList.filter(item => {
-    return item[1] === markMax
-  })
+  // console.log(markMax)
+  let markAvg = Math.round(arrayAvg(markArr))
 
   let markHour = handleWaitHourAvg(parkData, markList, conf)
 
@@ -108,7 +112,6 @@ const start = async conf => {
     markList,
     markMax,
     markAvg,
-    markMaxList,
     markHour,
     startTime,
     endTime

@@ -11,9 +11,9 @@ const destinations = require('./etl/explorer-service/destinations')
 const waitCount = require('./etl/wait-times/wait-count')
 const waitTimes = require('./etl/wait-times/wait-times')
 const parkCount = require('./etl/wait-times/park-count')
+const ticketCount = require('./etl/tickets/count')
 
 program
-  .version('0.1.0')
   .option('-f, --fn [value]', 'Add Fn')
   .option('-d, --date [value]', 'Add Date')
   .option('-l, --local [value]', 'Add Local')
@@ -68,6 +68,11 @@ const start = async () => {
     if (fn === 'park-count') {
       promises.push(Etl(parkCount, date, local))
     }
+
+    if (fn === 'ticket-count') {
+      promises.push(Etl(ticketCount, date, local))
+    }
+
 
     let results = await Promise.all(promises)
     console.log(results)

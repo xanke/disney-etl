@@ -5,6 +5,8 @@ module.exports = {
   find: async find => {
     return ScanSchedules.find(find).exec()
   },
+
+  // 获取乐园开放时间
   getByDisneyLand: async (name, date, local) => {
     let find = {
       date,
@@ -16,9 +18,9 @@ module.exports = {
     let activities = data.body.activities
     for (let item of activities) {
       let { id } = item
-      id = lineToObject(id)
-      id = id['__id__']
-      if (id === name) {
+
+      const { __id__, entityType } = lineToObject(id)
+      if (__id__ === name) {
         data = item
       }
     }

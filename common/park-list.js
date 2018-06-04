@@ -22,7 +22,8 @@ const parkList = [
     id: 'hkdl',
     lang: 'CN',
     local: 'hongkong',
-    utc: 8
+    utc: 8,
+    disneyLand: 'desHongKongDisneyland'
   },
   {
     id: 'shdr',

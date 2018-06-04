@@ -1,6 +1,6 @@
 {
   "name": "disney-etl",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Disney ETL and Api",
   "main": "index.js",
   "scripts": {

@@ -10,7 +10,8 @@ const parkList = [
     id: '80008297',
     lang: 'US',
     utc: -8,
-    local: 'california'
+    local: 'california',
+    disneyLand: '330339' // 336894
   },
   {
     id: 'dlp',

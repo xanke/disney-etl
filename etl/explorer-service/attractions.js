@@ -8,6 +8,8 @@ let Name = 'Attraction'
 const start = async conf => {
   let { local, date } = conf
   let find = { local, date }
+
+  // 读取项目时间表
   let data = await ScanSchedulesModel.find(find)
 
   if (data.length === 0) {

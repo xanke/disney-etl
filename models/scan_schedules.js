@@ -20,6 +20,7 @@ module.exports = {
       let { id } = item
 
       const { __id__, entityType } = lineToObject(id)
+      // console.log(entityType, __id__)
       if (__id__ === name) {
         data = item
       }

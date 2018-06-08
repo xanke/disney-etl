@@ -6,7 +6,7 @@ const Logs = require('../../util/logs')
 const { lineToObject } = require('../../common/api_tool')
 const { removeProperty } = require('../../util/util')
 
-let Name = 'Wait-Times'
+const Name = 'Wait-Times'
 
 const start = async conf => {
   let { date, local, option } = conf
@@ -94,6 +94,7 @@ const start = async conf => {
         local,
         id
       }
+
       let update = {
         waitList,
         utime
@@ -102,6 +103,7 @@ const start = async conf => {
       if (fpList.length > 0) {
         update.fpList = fpList
       }
+
       await DsAttractionModel.update(find, update)
     }
   }

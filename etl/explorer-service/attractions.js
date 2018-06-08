@@ -40,12 +40,14 @@ const start = async conf => {
         // 与当天时间表合并
         Object.assign(item, _schedules[0])
 
-        // 项目状态type -> status
+        // 项目状态 type -> status
         if (item.type) {
           item.status = item.type
           delete item.type
         }
+
         delete item.timeZone
+        delete item.schedule
 
         find.id = id['__id__']
         Object.assign(item, find)

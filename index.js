@@ -25,12 +25,15 @@ const start = async () => {
   let promises = []
 
   if (fn === 'all') {
-    console.log('Disney-ETL 0.3.1')
+    console.log('Disney-ETL 0.5.0')
 
     // 实时等候数据
     schedule.scheduleJob('*/2 * * * *', async () => {
       await Etl(waitTimes, null, 'shanghai', 'push')
       await Etl(waitTimes, null, 'hongkong', 'push')
+      await Etl(waitTimes, null, 'california', 'push')
+      await Etl(waitTimes, null, 'paris', 'push')
+      await Etl(waitTimes, null, 'orlando', 'push')
     })
 
     // 小时数据合并
@@ -40,15 +43,27 @@ const start = async () => {
 
       await Etl(waitCount, null, 'hongkong')
       await Etl(parkCount, null, 'hongkong')
+
+      await Etl(waitCount, null, 'california')
+      await Etl(parkCount, null, 'california')
+
+      await Etl(waitCount, null, 'paris')
+      await Etl(parkCount, null, 'paris')
+
+      await Etl(waitCount, null, 'orlando')
+      await Etl(parkCount, null, 'orlando')
     })
 
     // 乐园资料
-    schedule.scheduleJob('2 */2 * * *', async () => {
+    schedule.scheduleJob('2 */1 * * *', async () => {
       await Etl(attractions, null, 'shanghai')
       await Etl(attractions, null, 'hongkong')
+      await Etl(attractions, null, 'california')
+      await Etl(attractions, null, 'paris')
+      await Etl(attractions, null, 'orlando')
 
       // CDN 缓存简介
-      await Etl(destinations, null, 'shanghai')
+      // await Etl(destinations, null, 'shanghai')
     })
   } else {
     if (fn === 'stage-attractions') {

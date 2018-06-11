@@ -119,19 +119,19 @@ const start = async conf => {
 
   if (local === 'shanghai') {
     // 天气数据合并
-    data = await WeatherService.search('shanghai', date, date)
-    data = data[0]
+    // data = await WeatherService.search('shanghai', date, date)
+    // data = data[0]
 
-    if (data) {
-      let weather = {
-        wea: data.wea,
-        wind: data.wd,
-        temMax: data.max,
-        temMin: data.min,
-        aqi: data.aqi
-      }
-      Object.assign(update, weather)
-    }
+    // if (data) {
+    //   let weather = {
+    //     wea: data.wea,
+    //     wind: data.wd,
+    //     temMax: data.max,
+    //     temMin: data.min,
+    //     aqi: data.aqi
+    //   }
+    //   Object.assign(update, weather)
+    // }
 
     // 客流量数据合并
     data = await TravelService.flowDay('102', date)

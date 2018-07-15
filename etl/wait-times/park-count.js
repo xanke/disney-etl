@@ -80,30 +80,25 @@ const start = async conf => {
   let markList = []
 
   for (let k = 0; k < utimeArr.length; k++) {
-    // 循环所有项目
     let count = 0
+    // 循环所有项目 统计开放项目数量
     for (let arr of waitCube) {
       count += arr[k]
     }
 
-    if (count >= 0) {
-      markArr.push(count)
-
-      let utime = utimeArr[k]
-      let avg = Math.round(count / openAtt)
-      markList.push([utime, count, avg])
-    }
+    markArr.push(count)
+    const utime = utimeArr[k]
+    const avg = Math.round(count / openAtt)
+    markList.push([utime, count, avg])
   }
 
   // console.log(markArr)
 
   // 获取最高乐园指数
-  let markMax = Math.max(...markArr)
+  const markMax = Math.max(...markArr)
+  const markAvg = Math.round(arrayAvg(markArr))
 
-  // console.log(markMax)
-  let markAvg = Math.round(arrayAvg(markArr))
-
-  let markHour = handleWaitHourAvg(parkData, markList, conf)
+  const markHour = handleWaitHourAvg(parkData, markList, conf)
 
   let update = {
     id: disneyLand,

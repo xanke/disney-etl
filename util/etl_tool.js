@@ -58,6 +58,8 @@ exports.handleWaitHourAvg = (item, waitList, conf) => {
     moment(endTime, 'hh:mm:ss').format('H')
   )
 
+  console.log(sh, eh)
+
   for (let i = sh; i <= eh; i++) {
     // 样本数量和总和
     let len = 0

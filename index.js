@@ -25,9 +25,9 @@ const start = async () => {
   let promises = []
 
   if (fn === 'all') {
-    console.log('Disney-ETL 0.5.0')
+    console.log('Disney-ETL 0.6.0')
 
-    // 实时等候数据
+    // 实时等候数据 - 间隔 2 分钟
     schedule.scheduleJob('*/2 * * * *', async () => {
       await Etl(waitTimes, null, 'shanghai', 'push')
       await Etl(waitTimes, null, 'hongkong', 'push')
@@ -36,7 +36,7 @@ const start = async () => {
       await Etl(waitTimes, null, 'orlando', 'push')
     })
 
-    // 小时数据合并
+    // 小时数据合并 - 间隔 10 分钟
     schedule.scheduleJob('*/10 * * * *', async () => {
       await Etl(waitCount, null, 'shanghai')
       await Etl(parkCount, null, 'shanghai')

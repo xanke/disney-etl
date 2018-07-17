@@ -64,6 +64,7 @@ const start = async conf => {
   )
 
   // --- 乐园统计 ---
+
   const dataPark = await DsPark.findOne({
     local,
     date
@@ -113,6 +114,7 @@ const start = async conf => {
   )
 
   // --- 项目统计 ---
+
   const dataAtt = await DsAttraction.find({ local, date })
 
   for (let i = 0; i < dataAtt.length; i++) {

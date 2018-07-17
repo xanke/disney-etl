@@ -53,15 +53,36 @@ const start = async conf => {
 
   for (let i = 0; i < dataAtt.length; i++) {
     const item = dataAtt[i]
-    const { id, waitAvg, status, fpList } = item
+    const { id, waitAvg, fpList } = item
 
-    const rankWaitDay = await DsAttraction.count({
+    // 计算等候时间排名
+    const rankWait = await DsAttraction.count({
       local,
       id,
       waitAvg: { $gt: waitAvg }
     })
 
-    console.log(rankWaitDay)
+    // 计算快速通行证领完时间
+    let fpFinish = 0
+    if (fpList && fpList.length > 0) {
+      fpList.some(fitem => {
+        const [time, status] = fitem
+        if (status === 'FASTPASS is Not Available') {
+          fpFinish = time
+          return true
+        }
+      })
+    }
+
+    await DsAttraction.update(
+      { local, id, date },
+      {
+        $set: {
+          rankWait,
+          fpFinish
+        }
+      }
+    )
   }
 
   // console.log(dataAtt)

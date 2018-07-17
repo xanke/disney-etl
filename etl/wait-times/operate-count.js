@@ -45,13 +45,26 @@ const start = async conf => {
     markMax: { $gt: markMax }
   })
 
-  // 项目统计
-  // const dataAtt = await DsAttraction.findOne({ local, date })
-
-  // console.log(dataAtt)
-
   // console.log(allFlowDay, rankFlowDay)
   // console.log(allMarkDay, rankMarkDay)
+
+  // 项目统计
+  const dataAtt = await DsAttraction.find({ local, date })
+
+  for (let i = 0; i < dataAtt.length; i++) {
+    const item = dataAtt[i]
+    const { id, waitAvg, status, fpList } = item
+
+    const rankWaitDay = await DsAttraction.count({
+      local,
+      id,
+      waitAvg: { $gt: waitAvg }
+    })
+
+    console.log(rankWaitDay)
+  }
+
+  // console.log(dataAtt)
 }
 
 module.exports = start

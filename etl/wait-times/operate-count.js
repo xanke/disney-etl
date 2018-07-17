@@ -1,17 +1,69 @@
 const _ = require('lodash')
-const moment = require('moment')
-const { getSchedulesByDate, handleWaitHourAvg } = require('../../util/etl_tool')
-const { openTimeToX, arrayAvg } = require('../../util/util')
 const Logs = require('../../util/logs')
-const { DsPark, DsAttraction } = require('../../lib/mongo')
+const { DsPark, DsAttraction, DsOperate } = require('../../lib/mongo')
 
-let Name = 'Park-Count'
+let Name = 'Operate-Count'
 
 const start = async conf => {
   let { date, local, disneyLand } = conf
   let data
 
-  // 当天乐园统计
+  // --- 运营统计 ---
+
+  // 平均最高指数
+  let markMaxAvg = await DsPark.aggregate([
+    {
+      $match: {
+        local,
+        date: { $gt: '2016-06-16' },
+        markMax: { $gt: 0 }
+      }
+    },
+    {
+      $group: {
+        _id: 'avg',
+        avg: {
+          $avg: '$markMax'
+        }
+      }
+    }
+  ])
+
+  markMaxAvg = parseInt(markMaxAvg[0]['avg'])
+
+  // 平均客流量
+  let flowMaxAvg = await DsPark.aggregate([
+    {
+      $match: {
+        local,
+        date: { $gt: '2016-06-16' },
+        flowMax: { $gt: 0 }
+      }
+    },
+    {
+      $group: {
+        _id: 'avg',
+        avg: {
+          $avg: '$flowMax'
+        }
+      }
+    }
+  ])
+
+  flowMaxAvg = parseInt(flowMaxAvg[0]['avg'])
+
+  await DsOperate.update(
+    { local },
+    {
+      $set: {
+        markMaxAvg,
+        flowMaxAvg
+      }
+    },
+    { upsert: true }
+  )
+
+  // --- 乐园统计 ---
   const dataPark = await DsPark.findOne({
     local,
     date
@@ -45,10 +97,22 @@ const start = async conf => {
     markMax: { $gt: markMax }
   })
 
-  // console.log(allFlowDay, rankFlowDay)
-  // console.log(allMarkDay, rankMarkDay)
+  await DsPark.update(
+    {
+      local,
+      date
+    },
+    {
+      $set: {
+        allFlowDay,
+        rankFlowDay,
+        allMarkDay,
+        rankMarkDay
+      }
+    }
+  )
 
-  // 项目统计
+  // --- 项目统计 ---
   const dataAtt = await DsAttraction.find({ local, date })
 
   for (let i = 0; i < dataAtt.length; i++) {
@@ -85,7 +149,7 @@ const start = async conf => {
     )
   }
 
-  // console.log(dataAtt)
+  return Logs.msg(Name, 'OK', conf)
 }
 
 module.exports = start

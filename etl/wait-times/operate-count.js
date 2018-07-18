@@ -131,11 +131,10 @@ const start = async conf => {
     // 计算快速通行证领完时间
     let fpFinish = 0
     if (fpList && fpList.length > 0) {
-      fpList.some(fitem => {
+      fpList.forEach(fitem => {
         const [time, status] = fitem
-        if (status === 'FASTPASS is Not Available') {
+        if (status !== 'FASTPASS is Not Available') {
           fpFinish = time
-          return true
         }
       })
     }

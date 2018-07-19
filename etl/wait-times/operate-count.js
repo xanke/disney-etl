@@ -1,15 +1,16 @@
 const _ = require('lodash')
 const Logs = require('../../util/logs')
-const { DsPark, DsAttraction, DsOperate } = require('../../lib/mongo')
+const {
+  DsPark,
+  DsAttraction,
+  DsOperate,
+  DsCalendar
+} = require('../../lib/mongo')
 
 let Name = 'Operate-Count'
 
-const start = async conf => {
-  let { date, local, disneyLand } = conf
-  let data
-
-  // --- 运营统计 ---
-
+// 运营统计
+async function countOperate(local) {
   // 平均最高指数
   let markMaxAvg = await DsPark.aggregate([
     {
@@ -62,9 +63,10 @@ const start = async conf => {
     },
     { upsert: true }
   )
+}
 
-  // --- 乐园统计 ---
-
+// 乐园统计
+async function countPark(local, date) {
   const dataPark = await DsPark.findOne({
     local,
     date
@@ -112,9 +114,10 @@ const start = async conf => {
       }
     }
   )
+}
 
-  // --- 项目统计 ---
-
+// 项目统计
+async function countAtt(local, date) {
   const dataAtt = await DsAttraction.find({ local, date })
 
   for (let i = 0; i < dataAtt.length; i++) {
@@ -149,6 +152,44 @@ const start = async conf => {
       }
     )
   }
+}
+
+// 演出场次统计
+async function countSchedules(local, date) {
+  const dataSchedules = await DsCalendar.findOne({ local, date })
+  const { data: schedules } = dataSchedules
+
+  let show = 0
+  schedules.forEach(item => {
+    const { name, schedule } = item
+
+    schedule.forEach(arr => {
+      const { date: _date } = arr
+      if (_date === date) {
+        show++
+      }
+    })
+  })
+  await DsPark.update(
+    {
+      local,
+      date
+    },
+    {
+      $set: {
+        show
+      }
+    }
+  )
+}
+
+const start = async conf => {
+  let { date, local, disneyLand } = conf
+
+  await countOperate(local, date)
+  await countPark(local, date)
+  await countAtt(local, date)
+  await countSchedules(local, date)
 
   return Logs.msg(Name, 'OK', conf)
 }

@@ -53,12 +53,56 @@ async function countOperate(local) {
 
   flowMaxAvg = parseInt(flowMaxAvg[0]['avg'])
 
+  // 平均开放项目
+  let openAttAvg = await DsPark.aggregate([
+    {
+      $match: {
+        local,
+        date: { $gt: '2016-06-16' },
+        openAtt: { $gt: 0 }
+      }
+    },
+    {
+      $group: {
+        _id: 'avg',
+        avg: {
+          $avg: '$openAtt'
+        }
+      }
+    }
+  ])
+
+  openAttAvg = parseInt(openAttAvg[0]['avg'])
+
+  // 平均演出场次
+  let showAvg = await DsPark.aggregate([
+    {
+      $match: {
+        local,
+        date: { $gt: '2016-06-16' },
+        show: { $gt: 0 }
+      }
+    },
+    {
+      $group: {
+        _id: 'avg',
+        avg: {
+          $avg: '$show'
+        }
+      }
+    }
+  ])
+
+  showAvg = parseInt(showAvg[0]['avg'])
+
   await DsOperate.update(
     { local },
     {
       $set: {
         markMaxAvg,
-        flowMaxAvg
+        flowMaxAvg,
+        openAttAvg,
+        showAvg
       }
     },
     { upsert: true }
@@ -157,6 +201,8 @@ async function countAtt(local, date) {
 // 演出场次统计
 async function countSchedules(local, date) {
   const dataSchedules = await DsCalendar.findOne({ local, date })
+  if (!dataSchedules) return
+
   const { data: schedules } = dataSchedules
 
   let show = 0

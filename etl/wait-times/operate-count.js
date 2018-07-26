@@ -6,6 +6,7 @@ const {
   DsOperate,
   DsCalendar
 } = require('../../lib/mongo')
+const moment = require('moment')
 
 let Name = 'Operate-Count'
 
@@ -164,6 +165,7 @@ async function countPark(local, date) {
 async function countAtt(local, date) {
   const dataAtt = await DsAttraction.find({ local, date })
 
+  let enterTime = Infinity
   for (let i = 0; i < dataAtt.length; i++) {
     const item = dataAtt[i]
     const { id, waitAvg, fpList } = item
@@ -180,7 +182,11 @@ async function countAtt(local, date) {
     if (fpList && fpList.length > 0) {
       fpList.forEach(fitem => {
         const [time, status] = fitem
-        if (status !== 'FASTPASS is Not Available') {
+        if (moment(status, 'HH:mm:ss').format('x') !== 'Invalid date') {
+          // console.log(time, status)
+          if (time < enterTime) {
+            enterTime = time
+          }
           fpFinish = time
         }
       })
@@ -196,6 +202,21 @@ async function countAtt(local, date) {
       }
     )
   }
+
+  // 开园时间
+  enterTime = moment(enterTime, 'x').format('HH:mm:ss')
+
+  await DsPark.update(
+    {
+      local,
+      date
+    },
+    {
+      $set: {
+        enterTime
+      }
+    }
+  )
 }
 
 // 演出场次统计

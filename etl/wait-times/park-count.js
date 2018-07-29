@@ -11,6 +11,17 @@ const Logs = require('../../util/logs')
 
 let Name = 'Park-Count'
 
+function parseTempDate(range, date) {
+  const [startTime, endTime] = range
+
+  return {
+    startX: moment(`${date} ${startTime}`, 'YYYY-MM-DD HH:mm:ss').format('x'),
+    endX: moment(`${date} ${endTime}`, 'YYYY-MM-DD HH:mm:ss').format('x'),
+    startTime,
+    endTime
+  }
+}
+
 const start = async conf => {
   let { date, local, disneyLand } = conf
   let data
@@ -25,14 +36,33 @@ const start = async conf => {
     console.log('get_schedules 无数据')
   }
 
+  parkData = {
+    startX: moment(`${date} 08:00:00`, 'YYYY-MM-DD HH:mm:ss').format('x'),
+    endX: moment(`${date} 20:00:00`, 'YYYY-MM-DD HH:mm:ss').format('x'),
+    startTime: '08:00:00',
+    endTime: '20:00:00'
+  }
+
   if (!parkData) {
     try {
       data = await DsAttractionModel.getParkSchedules(date, conf)
       parkData = data
     } catch (e) {
       console.log('stage 无数据')
-      return
     }
+  }
+
+  const parkTemp = {
+    '2018-02-12': ['08:00:00', '22:00:00'],
+    '2018-04-20': ['08:00:00', '20:30:00'],
+    '2018-04-25': ['08:00:00', '20:00:00']
+  }
+
+  if (parkTemp[date]) {
+    parkData = parseTempDate(parkTemp[date], date)
+  } else {
+    console.log('temp 无数据')
+    return
   }
 
   // 获取当天开放时间
@@ -76,6 +106,8 @@ const start = async conf => {
     }
   }
 
+  console.log(waitCube)
+
   let markArr = []
   let markList = []
 
@@ -86,13 +118,15 @@ const start = async conf => {
       count += arr[k]
     }
 
+    if (isNaN(count)) count = 0
+
     markArr.push(count)
     const utime = utimeArr[k]
     const avg = Math.round(count / openAtt)
     markList.push([utime, count, avg])
   }
 
-  // console.log(markArr)
+  console.log(markArr)
 
   // 获取最高乐园指数
   const markMax = Math.max(...markArr)

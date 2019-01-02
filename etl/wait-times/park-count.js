@@ -61,8 +61,8 @@ const start = async conf => {
   if (parkTemp[date]) {
     parkData = parseTempDate(parkTemp[date], date)
   } else {
-    console.log('temp 无数据')
-    return
+    // console.log('temp 无数据')
+    // return
   }
 
   // 获取当天开放时间
@@ -106,7 +106,7 @@ const start = async conf => {
     }
   }
 
-  console.log(waitCube)
+  // console.log(waitCube)
 
   let markArr = []
   let markList = []
@@ -126,7 +126,7 @@ const start = async conf => {
     markList.push([utime, count, avg])
   }
 
-  console.log(markArr)
+  // console.log(markArr)
 
   // 获取最高乐园指数
   const markMax = Math.max(...markArr)
@@ -164,6 +164,7 @@ const start = async conf => {
 
     // 客流量数据合并
     data = await TravelService.flowDay('102', date)
+    console.log(data)
     if (data.length > 0) {
       let flowList = []
       let flowArr = []

@@ -4,4 +4,3 @@ COPY . /app/
 WORKDIR /app
 
 RUN yarn install
-CMD ["node", "index", "-f all"]
